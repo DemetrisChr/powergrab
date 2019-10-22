@@ -13,7 +13,6 @@ public class StatelessDrone extends Drone {
 	}
 	
 	public void nextMove() {
-		System.out.println("THIS SHOULDN'T HAVE HAPPENED!");
 		ArrayList<Direction> bestDirections = new ArrayList<Direction>();
 		double maxCoins = Double.NEGATIVE_INFINITY;
 		for (Direction d : Direction.values()) {
