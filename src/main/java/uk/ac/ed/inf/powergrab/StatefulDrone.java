@@ -12,18 +12,17 @@ public class StatefulDrone extends Drone {
 		super(position, randomSeed);
 	}
 	
-	public boolean nextMove(Station targetStation) {
+	public boolean nextMove(Station targetStation, List<Position> recentPositions) {
 		// Next move is the reachable position that is closer to the target station
 		boolean reachedTarget = false;
 		ArrayList<Direction> bestDirections = new ArrayList<Direction>();
 		double minDistance = Double.MAX_VALUE;
 		for (Direction d : Direction.values()) {
 			Position p = this.position.nextPosition(d);
-			if (p.inPlayArea()) {
+			if (p.inPlayArea() && !(recentPositions.contains(p))) {
 				Station connectedStation = this.game.getConnectedStation(p);
 				if (targetStation == null) {
-					if ((connectedStation != null) && (connectedStation.getCoins() >= 0))
-					bestDirections.add(d);
+						bestDirections.add(d);
 				} else {
 					double dist = targetStation.getPosition().distance(p);
 					if ((connectedStation != null) && (connectedStation.getCoins() < 0)) {
@@ -62,7 +61,8 @@ public class StatefulDrone extends Drone {
 		Station targetStation = this.game.getNearestPositiveStation(this.position);
 		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
-			boolean reachedTarget = this.nextMove(targetStation);
+			List<Position> recentPositions = path.subList(path.size()-Math.min(path.size(),5), path.size()-1);
+			boolean reachedTarget = this.nextMove(targetStation, recentPositions);
 			if (reachedTarget)
 				targetStation = this.game.getNearestPositiveStation(this.position);
 			path.add(this.position);

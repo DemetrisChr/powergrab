@@ -24,7 +24,7 @@ public class Game {
 		Station nearestStation = null; 
 		for (Station s: stations.values()) {
 			double dist = pos.distance(s.getPosition());
-			if ((dist > CONNECT_DISTANCE) && (dist < minDistance) && (s.getCoins() > 0)) {
+			if ((dist < minDistance) && (s.getCoins() > 0)) {
 				minDistance = dist;
 				nearestStation = s;
 			}
