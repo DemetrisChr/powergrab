@@ -4,22 +4,28 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Collections;
-
+import java.util.Queue;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 public class StatefulDrone extends Drone {
 
+	private static final int NUM_RECENT_POSITIONS = 5;
+	private Queue<Position> recentPositions;
+
 	public StatefulDrone(Position position, long randomSeed) {
 		super(position, randomSeed);
+		this.recentPositions = new CircularFifoQueue<Position>(NUM_RECENT_POSITIONS);
+		this.recentPositions.add(this.position);
 	}
 	
-	public boolean nextMove(Station targetStation, List<Position> recentPositions) {
+	public boolean nextMove(Station targetStation) {
 		// Next move is the reachable position that is closer to the target station
 		boolean reachedTarget = false;
 		ArrayList<Direction> bestDirections = new ArrayList<Direction>();
 		double minDistance = Double.MAX_VALUE;
 		for (Direction d : Direction.values()) {
 			Position p = this.position.nextPosition(d);
-			if (p.inPlayArea() && !(recentPositions.contains(p))) {
+			if (p.inPlayArea() && !(this.recentPositions.contains(p))) {
 				Station connectedStation = this.game.getConnectedStation(p);
 				if (targetStation == null) {
 						bestDirections.add(d);
@@ -61,10 +67,10 @@ public class StatefulDrone extends Drone {
 		Station targetStation = this.game.getNearestPositiveStation(this.position);
 		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
-			List<Position> recentPositions = path.subList(path.size()-Math.min(path.size(),5), path.size()-1);
-			boolean reachedTarget = this.nextMove(targetStation, recentPositions);
+			boolean reachedTarget = this.nextMove(targetStation);
 			if (reachedTarget)
 				targetStation = this.game.getNearestPositiveStation(this.position);
+			this.recentPositions.add(this.position);
 			path.add(this.position);
 		}
 		if (this.power < POWER_CONSUMPTION) {
