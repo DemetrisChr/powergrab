@@ -43,7 +43,8 @@ public class App
 			drone = new StatelessDrone(new Position(latitude, longitude), randomSeed);
 		}
 		Game game = new Game(drone, stations);
-		List<Position> path = drone.planPath();
+		drone.planPath();
+		List<Position> path = drone.getPath();
         gj.addPathToJSON(path);
         try {
 			gj.printGeoJsonToFile();

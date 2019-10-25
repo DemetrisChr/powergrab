@@ -1,5 +1,6 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -9,6 +10,7 @@ public abstract class Drone {
 	protected double power = 250;
 	protected double coins = 0;
 	protected Random rnd = new Random();
+	protected List<Move> moveHistory = new ArrayList<Move>();
 	protected static final double POWER_CONSUMPTION = 1.25;
 	
 	public Drone(Position position, long randomSeed) {
@@ -40,10 +42,23 @@ public abstract class Drone {
 		return power;
 	}
 	
-	public abstract List<Position> planPath();
+	public abstract void planPath();
 	
-	public void move(Direction direction) {
-		this.position = this.position.nextPosition(direction);
+	public Move move(Direction direction) {
+		Move theMove = new Move(this.game, this, direction);
+		theMove.move();
+		return theMove;
+	}
+
+	public List<Move> getMoveHistory() {
+		return this.moveHistory;
+	}
+
+	public List<Position> getPath() {
+		ArrayList<Position> path = new ArrayList<Position>();
+		path.add(moveHistory.get(0).getPositionBefore());
+		moveHistory.forEach( (move) -> path.add(move.getPositionAfter()) );
+		return path;
 	}
 	
 }

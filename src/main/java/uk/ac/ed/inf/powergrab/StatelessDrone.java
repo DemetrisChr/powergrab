@@ -37,28 +37,19 @@ public class StatelessDrone extends Drone {
 		// Direction moveDirection = bestDirections.get(this.rnd.nextInt(bestDirections.size()));
 		Collections.shuffle(bestDirections, this.rnd);
 		Direction moveDirection = bestDirections.get(0);
-		Position nextPosition = this.position.nextPosition(moveDirection);
-		this.position = nextPosition;
-		Station connectedStation = this.game.getConnectedStation(this.position);
-		if (connectedStation != null) {
-			connectedStation.connect(this);
-		}
-		this.power -= POWER_CONSUMPTION;
+		Move move = this.move(moveDirection);
+		this.moveHistory.add(move);
 	}
 	
-	public List<Position> planPath() {
+	public void planPath() {
 		int numMoves = 0;
-		ArrayList<Position> path = new ArrayList<Position>();
-		path.add(this.position);
 		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
 			this.nextMove();
-			path.add(this.position);
 		}
 		if (this.power < POWER_CONSUMPTION) {
 			System.out.println("Out of power!");
 		}
-		return path;
 	}
 
 }
