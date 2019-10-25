@@ -1,6 +1,5 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Queue;
@@ -10,6 +9,7 @@ public class StatefulDrone extends Drone {
 
 	private static final int NUM_RECENT_POSITIONS = 5;
 	private Queue<Position> recentPositions;
+	private Station targetStation = null;
 
 
 	public StatefulDrone(Position position, long randomSeed) {
@@ -25,7 +25,7 @@ public class StatefulDrone extends Drone {
 		for (Direction d : Direction.values()) {
 			Position p = this.position.nextPosition(d);
 			if (p.inPlayArea() && !(this.recentPositions.contains(p))) {
-				Station connectedStation = this.game.getConnectedStation(p);
+				Station connectedStation = Game.getInstance().getConnectedStation(p);
 				if (targetStation == null) {
 						bestDirections.add(d);
 				} else {
@@ -54,14 +54,14 @@ public class StatefulDrone extends Drone {
 	
 	public void planPath() {
 		int numMoves = 0;
-		Station targetStation = this.game.getNearestPositiveStation(this.position);
+		this.targetStation = Game.getInstance().getNearestPositiveStation(this.position);
 		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
 			Move move = this.nextMove(targetStation);
 			// check if target has been reached
 			Station connectedStation = move.getConnectedStation();
 			if ((connectedStation != null) && (connectedStation.equals(targetStation)))
-				targetStation = this.game.getNearestPositiveStation(this.position);
+				targetStation = Game.getInstance().getNearestPositiveStation(this.position);
 		}
 		if (this.power < POWER_CONSUMPTION) {
 			System.out.println("Out of power!");

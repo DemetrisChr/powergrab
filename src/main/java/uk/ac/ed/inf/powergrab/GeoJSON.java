@@ -20,7 +20,6 @@ import java.util.HashMap;
 
 public class GeoJSON {
 	private final FeatureCollection fc;
-	private Map<Position, Station> stations = new HashMap<Position, Station>();
 	
 	public GeoJSON(String year, String month, String day) throws IOException {
 		String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
@@ -38,9 +37,10 @@ public class GeoJSON {
 		JsonElement root = parser.parse(isReader);
 		String mapSource = root.toString();
 		this.fc = FeatureCollection.fromJson(mapSource);
-		System.out.println(mapSource.length());
-
-		// Fill the stations map
+	}
+	
+	public Map<Position, Station> getStationsFromMap(){
+		Map<Position, Station> stations = new HashMap<Position, Station>();
 		for (Feature f : fc.features()) {
 			double coins = f.getProperty("coins").getAsDouble();
 			double power = f.getProperty("power").getAsDouble();
@@ -49,16 +49,12 @@ public class GeoJSON {
 			double longitude = coordinates.get(0);
 			double latitude = coordinates.get(1);
 			Position pos = new Position(latitude, longitude);
-			this.stations.put(pos, new Station(pos, coins, power));
+			stations.put(pos, new Station(pos, coins, power));
 		}
-	}
-	
-	public Map<Position, Station> getStations(){
 		return stations;
 	}
 	
-	
-	public void addPathToJSON(List<Position> pathPositions) {
+	public void addPathToGeoJSON(List<Position> pathPositions) {
 		ArrayList<Point> pointsList = new ArrayList<Point>();
 		for (Position pos : pathPositions) {
 			pointsList.add(Point.fromLngLat(pos.longitude, pos.latitude));
@@ -72,9 +68,5 @@ public class GeoJSON {
 		PrintWriter output = new PrintWriter("output.geojson");
 		output.println(fc.toJson());
 		output.close();
-	}
-	
-	public String toString() {
-		return "GeoJSON object representing map with " + stations.size() + " stations";
 	}
 }

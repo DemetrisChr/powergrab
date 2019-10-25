@@ -38,7 +38,7 @@ public class Station {
 	}
 	
 	public String toString() {
-		return "Station with "+this.coins+" coins and "+this.power+" power";
+		return "Station at "+this.position.latitude+" , "+this.position.longitude;
 	}
 	
 	@Override
