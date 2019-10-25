@@ -7,14 +7,13 @@ import org.apache.commons.collections4.queue.CircularFifoQueue;
 
 public class StatefulDrone extends Drone {
 
-	private static final int NUM_RECENT_POSITIONS = 5;
 	private Queue<Position> recentPositions;
 	private Station targetStation = null;
 
 
 	public StatefulDrone(Position position, long randomSeed) {
 		super(position, randomSeed);
-		this.recentPositions = new CircularFifoQueue<Position>(NUM_RECENT_POSITIONS);
+		this.recentPositions = new CircularFifoQueue<Position>(GameRules.NUM_RECENT_POSITIONS);
 		this.recentPositions.add(this.position);
 	}
 	
@@ -55,7 +54,7 @@ public class StatefulDrone extends Drone {
 	public void planPath() {
 		int numMoves = 0;
 		this.targetStation = Game.getInstance().getNearestPositiveStation(this.position);
-		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
+		while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
 			Move move = this.nextMove(targetStation);
 			// check if target has been reached
@@ -63,7 +62,7 @@ public class StatefulDrone extends Drone {
 			if ((connectedStation != null) && (connectedStation.equals(targetStation)))
 				targetStation = Game.getInstance().getNearestPositiveStation(this.position);
 		}
-		if (this.power < POWER_CONSUMPTION) {
+		if (this.power < GameRules.POWER_CONSUMPTION) {
 			System.out.println("Out of power!");
 		}
 		System.out.println(this.coins + " Coins Collected");

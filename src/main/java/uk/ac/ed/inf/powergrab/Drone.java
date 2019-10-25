@@ -10,7 +10,6 @@ public abstract class Drone {
 	protected double coins = 0;
 	protected Random rnd = new Random();
 	protected List<Move> moveHistory = new ArrayList<Move>();
-	protected static final double POWER_CONSUMPTION = 1.25;
 	
 	public Drone(Position position, long randomSeed) {
 		this.position = position;

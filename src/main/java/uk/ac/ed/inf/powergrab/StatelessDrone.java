@@ -41,11 +41,11 @@ public class StatelessDrone extends Drone {
 	
 	public void planPath() {
 		int numMoves = 0;
-		while (this.power >= POWER_CONSUMPTION && numMoves < 250) {
+		while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < 250) {
 			numMoves++;
 			this.nextMove();
 		}
-		if (this.power < POWER_CONSUMPTION) {
+		if (this.power < GameRules.POWER_CONSUMPTION) {
 			System.out.println("Out of power!");
 		}
 	}
