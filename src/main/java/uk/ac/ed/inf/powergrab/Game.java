@@ -1,28 +1,39 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.Collection;
+import java.io.IOException;
 import java.util.Map;
-import java.util.Random;
 
 public class Game {
-	private Drone drone;
-	private Map<Position, Station> stations;
+	private GeoJSON gameMap = null;
+	private Drone drone = null;
+	private Map<Position, Station> stations = null;
+
 	public static final double CONNECT_DISTANCE = 0.00025;
+	private static final Game GAME_INSTANCE = new Game();
 	
-	public Game(Drone drone, Map<Position, Station> stations) {
-		this.drone = drone;
-		this.stations = stations;
-		drone.setGame(this);
+	private Game() {}
+
+	public static Game getInstance() {
+		return GAME_INSTANCE;
 	}
-	
-	public Collection<Station> getStations() {
-		return stations.values();
+
+	public void setDrone(Drone drone) {
+		this.drone = drone;
+	}
+
+	public void setGameMap(String year, String month, String day) throws IOException {
+		this.gameMap = new GeoJSON(year, month, day);
+		this.stations = this.gameMap.getStationsFromMap();
+	}
+
+	public GeoJSON getGameMap() {
+		return this.gameMap;
 	}
 	
 	public Station getNearestPositiveStation(Position pos) {
 		double minDistance = Double.MAX_VALUE;
 		Station nearestStation = null; 
-		for (Station s: stations.values()) {
+		for (Station s: this.stations.values()) {
 			double dist = pos.distance(s.getPosition());
 			if ((dist < minDistance) && (s.getCoins() > 0)) {
 				minDistance = dist;
@@ -35,10 +46,10 @@ public class Game {
 	public Station getConnectedStation(Position pos) {
 		Station connectedStation = null;
 		double distanceFromDrone = Double.MAX_VALUE;
-		for (Position stationPosition : stations.keySet()) {
+		for (Position stationPosition : this.stations.keySet()) {
 			double dist = pos.distance(stationPosition);
 			if (dist < distanceFromDrone) {
-				connectedStation = stations.get(stationPosition);
+				connectedStation = this.stations.get(stationPosition);
 				distanceFromDrone = dist;
 			}
 		}

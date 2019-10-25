@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class Drone {
-	protected Game game;
 	protected Position position;
 	protected double power = 250;
 	protected double coins = 0;
@@ -26,10 +25,6 @@ public abstract class Drone {
 		this.coins += coinsIncr;
 	}
 	
-	public void setGame(Game game) {
-		this.game = game;
-	}
-	
 	public Position getPosition() {
 		return position;
 	}
@@ -45,7 +40,7 @@ public abstract class Drone {
 	public abstract void planPath();
 	
 	public Move move(Direction direction) {
-		Move theMove = new Move(this.game, this, direction);
+		Move theMove = new Move(this, direction);
 		theMove.move();
 		return theMove;
 	}

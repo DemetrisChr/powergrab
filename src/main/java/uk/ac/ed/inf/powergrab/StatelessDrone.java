@@ -1,8 +1,6 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Collections;
 
 
@@ -17,7 +15,7 @@ public class StatelessDrone extends Drone {
 		double maxCoins = Double.NEGATIVE_INFINITY;
 		for (Direction d : Direction.values()) {
 			Position p = this.position.nextPosition(d);
-			Station s = game.getConnectedStation(p);
+			Station s = Game.getInstance().getConnectedStation(p);
 			double coins;
 			if (p.inPlayArea()) {
 				if (s == null) {
