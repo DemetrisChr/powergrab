@@ -1,12 +1,18 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 
 public class Game {
 	private GeoJSON gameMap = null;
 	private Drone drone = null;
 	private Map<Position, Station> stations = null;
+	private String year;
+	private String month;
+	private String day;
 
 	private static final Game GAME_INSTANCE = new Game();
 	
@@ -21,6 +27,9 @@ public class Game {
 	}
 
 	public void setGameMap(String year, String month, String day) throws IOException {
+		this.year = year;
+		this.month = month;
+		this.day = day;
 		this.gameMap = new GeoJSON(year, month, day);
 		this.stations = this.gameMap.getStationsFromMap();
 	}
@@ -57,5 +66,17 @@ public class Game {
 		} else {
 			return null;
 		}
+	}
+
+	public void outputToFiles() throws FileNotFoundException {
+		String fileName = "./outputs/"+drone.getDroneType()+"-"+day+"-"+month+"-"+year;
+		PrintWriter outputGeoJson = new PrintWriter(fileName+".geojson");
+		outputGeoJson.println(gameMap.getFeatureCollection().toJson());
+		outputGeoJson.close();
+		PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
+		List<Move> moveHistory = drone.getMoveHistory();
+		for (Move move : moveHistory)
+			outputMoveHistory.println(move);
+		outputMoveHistory.close();
 	}
 }

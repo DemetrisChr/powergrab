@@ -16,6 +16,10 @@ public class StatefulDrone extends Drone {
 		this.recentPositions = new CircularFifoQueue<Position>(GameRules.NUM_RECENT_POSITIONS);
 		this.recentPositions.add(this.position);
 	}
+
+	public String getDroneType() {
+		return "stateful";
+	}
 	
 	public Move nextMove(Station targetStation) {
 		// Next move is the reachable position that is closer to the target station

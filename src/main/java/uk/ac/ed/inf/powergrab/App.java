@@ -37,7 +37,7 @@ public class App
 		drone.planPath();
         Game.getInstance().getGameMap().addPathToGeoJSON(drone.getPath());
         try {
-			Game.getInstance().getGameMap().printGeoJsonToFile();
+			Game.getInstance().outputToFiles();
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found!");
 		}
