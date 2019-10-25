@@ -8,7 +8,6 @@ public class Move {
     private Double powerAfter = null;
     private Drone droneToMove;
     private Station connectedStation = null;
-    private static final double POWER_CONSUMPTION = 1.25;
 
     public Move(Drone droneToMove, Direction moveDirection) {
         this.positionBefore = droneToMove.getPosition();
@@ -22,7 +21,7 @@ public class Move {
         this.connectedStation = Game.getInstance().getConnectedStation(this.positionAfter);
         if (this.connectedStation != null)
             this.connectedStation.connect(droneToMove);
-        droneToMove.power -= POWER_CONSUMPTION;
+        droneToMove.power -= GameRules.POWER_CONSUMPTION;
         this.powerAfter = droneToMove.getPower();
         this.coinsAfter = droneToMove.getCoins();
     }

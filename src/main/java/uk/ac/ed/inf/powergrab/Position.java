@@ -3,28 +3,23 @@ package uk.ac.ed.inf.powergrab;
 public class Position {
 	public final double latitude;
 	public final double longitude;
-	
-	// Play area boundaries
-	private static final double TOP = 55.946233;
-	private static final double BOTTOM = 55.942617;
-	private static final double RIGHT = -3.184319;
-	private static final double LEFT = -3.192473;
-	
-	public static final double TRAVEL_DISTANCE = 0.0003;
-	
+
 	public Position(double latitude, double longitude) {
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
 	
 	public Position nextPosition(Direction direction) {
-		double newLatitude = this.latitude + TRAVEL_DISTANCE * direction.cosine;
-		double newLongitude = this.longitude + TRAVEL_DISTANCE * direction.sine;
+		double newLatitude = this.latitude + GameRules.TRAVEL_DISTANCE * direction.cosine;
+		double newLongitude = this.longitude + GameRules.TRAVEL_DISTANCE * direction.sine;
 		return new Position(newLatitude, newLongitude);
 	}
 	
 	public boolean inPlayArea() {
-		return (longitude < RIGHT) && (longitude > LEFT) && (latitude > BOTTOM) && (latitude < TOP);
+		return (longitude < GameRules.RIGHT)
+				&& (longitude > GameRules.LEFT)
+				&& (latitude > GameRules.BOTTOM)
+				&& (latitude < GameRules.TOP);
 	}
 	
 	public double distance(Position pos) {

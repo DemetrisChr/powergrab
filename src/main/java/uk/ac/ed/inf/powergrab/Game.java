@@ -8,7 +8,6 @@ public class Game {
 	private Drone drone = null;
 	private Map<Position, Station> stations = null;
 
-	public static final double CONNECT_DISTANCE = 0.00025;
 	private static final Game GAME_INSTANCE = new Game();
 	
 	private Game() {}
@@ -53,7 +52,7 @@ public class Game {
 				distanceFromDrone = dist;
 			}
 		}
-		if (distanceFromDrone < CONNECT_DISTANCE) {
+		if (distanceFromDrone < GameRules.CONNECT_DISTANCE) {
 			return connectedStation;
 		} else {
 			return null;
