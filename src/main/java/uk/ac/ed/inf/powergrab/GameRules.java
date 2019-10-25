@@ -5,6 +5,7 @@ public class GameRules {
     public static final double POWER_CONSUMPTION = 1.25;
     public static final double TRAVEL_DISTANCE = 0.0003;
     public static final int NUM_RECENT_POSITIONS = 5;
+    public static final int NEGATIVE_STATION_PENALTY = 2;
 
     // Play area boundaries
     public static final double TOP = 55.946233;

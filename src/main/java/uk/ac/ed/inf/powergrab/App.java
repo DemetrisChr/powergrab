@@ -18,7 +18,6 @@ public class App
     	String droneType = args[6];
 
 		Drone drone;
-		System.out.println(droneType);
 		if (droneType.equals("stateful")) {
 			drone = new StatefulDrone(new Position(latitude, longitude), randomSeed);
 		} else {
@@ -41,5 +40,6 @@ public class App
 		} catch (FileNotFoundException e) {
 			System.out.println("File not found!");
 		}
+        System.out.println(droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+Game.getInstance().getPerfectScore());
     }
 }

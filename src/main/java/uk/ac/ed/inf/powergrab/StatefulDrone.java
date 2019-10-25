@@ -34,7 +34,7 @@ public class StatefulDrone extends Drone {
 				} else {
 					double dist = targetStation.getPosition().distance(p);
 					if ((connectedStation != null) && (connectedStation.getCoins() < 0)) {
-						dist =  2 * dist;
+						dist =  GameRules.NEGATIVE_STATION_PENALTY * dist;
 					}
 					if (dist < minDistance) {
 						minDistance = dist;
@@ -66,9 +66,8 @@ public class StatefulDrone extends Drone {
 			if ((connectedStation != null) && (connectedStation.equals(targetStation)))
 				targetStation = Game.getInstance().getNearestPositiveStation(this.position);
 		}
-		if (this.power < GameRules.POWER_CONSUMPTION) {
-			System.out.println("Out of power!");
-		}
-		System.out.println(this.coins + " Coins Collected");
+		//if (this.power < GameRules.POWER_CONSUMPTION) {
+		//	System.out.println("Out of power!");
+		//}
 	}
 }

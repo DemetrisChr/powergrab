@@ -13,6 +13,7 @@ public class Game {
 	private String year;
 	private String month;
 	private String day;
+	private double perfectScore = 0;
 
 	private static final Game GAME_INSTANCE = new Game();
 	
@@ -20,6 +21,10 @@ public class Game {
 
 	public static Game getInstance() {
 		return GAME_INSTANCE;
+	}
+
+	public double getPerfectScore() {
+		return perfectScore;
 	}
 
 	public void setDrone(Drone drone) {
@@ -32,6 +37,10 @@ public class Game {
 		this.day = day;
 		this.gameMap = new GeoJSON(year, month, day);
 		this.stations = this.gameMap.getStationsFromMap();
+		double ps = 0;
+		for (Station s : stations.values())
+			ps += Math.max(0, s.getCoins());
+		this.perfectScore = ps;
 	}
 
 	public GeoJSON getGameMap() {

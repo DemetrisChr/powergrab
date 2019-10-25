@@ -49,8 +49,8 @@ public class StatelessDrone extends Drone {
 			numMoves++;
 			this.nextMove();
 		}
-		if (this.power < GameRules.POWER_CONSUMPTION) {
-			System.out.println("Out of power!");
-		}
+		//if (this.power < GameRules.POWER_CONSUMPTION) {
+		//	System.out.println("Out of power!");
+		//}
 	}
 }
