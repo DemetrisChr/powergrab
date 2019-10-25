@@ -9,7 +9,11 @@ public class StatelessDrone extends Drone {
 	public StatelessDrone(Position position, long randomSeed) {
 		super(position, randomSeed);
 	}
-	
+
+	public String getDroneType() {
+		return "stateless";
+	}
+
 	public void nextMove() {
 		ArrayList<Direction> bestDirections = new ArrayList<Direction>();
 		double maxCoins = Double.NEGATIVE_INFINITY;
@@ -49,5 +53,4 @@ public class StatelessDrone extends Drone {
 			System.out.println("Out of power!");
 		}
 	}
-
 }

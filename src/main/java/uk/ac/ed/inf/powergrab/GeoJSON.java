@@ -8,9 +8,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.JsonElement;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,10 +61,8 @@ public class GeoJSON {
 		Feature f = Feature.fromGeometry(flightPath);
 		fc.features().add(f);
 	}
-	
-	public void printGeoJsonToFile() throws FileNotFoundException {
-		PrintWriter output = new PrintWriter("output.geojson");
-		output.println(fc.toJson());
-		output.close();
+
+	public FeatureCollection getFeatureCollection() {
+		return fc;
 	}
 }

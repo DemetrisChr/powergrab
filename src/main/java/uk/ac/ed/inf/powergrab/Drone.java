@@ -37,6 +37,8 @@ public abstract class Drone {
 	}
 	
 	public abstract void planPath();
+
+	public abstract String getDroneType();
 	
 	public Move move(Direction direction) {
 		Move theMove = new Move(this, direction);
