@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class Position {
 	public final double latitude;
 	public final double longitude;
@@ -25,6 +28,17 @@ public class Position {
 	public double distance(Position pos) {
 		return Math.sqrt(Math.pow(this.latitude - pos.latitude, 2) + Math.pow(this.longitude - pos.longitude, 2));
 	}
+
+	public Map<Direction, Position> getAdjacentPositions() {
+		HashMap<Direction, Position> adjacentPositions = new HashMap<Direction, Position>();
+		for (Direction d : Direction.values()) {
+			Position p = this.nextPosition(d);
+			if (p.inPlayArea()) {
+				adjacentPositions.put(d, p);
+			}
+		}
+		return adjacentPositions;
+	}
 	
 	@Override
 	public boolean equals(Object o) {
@@ -37,5 +51,10 @@ public class Position {
 		Position p = (Position) o;
 		return (Double.compare(this.latitude, p.latitude) == 0)
 			&& (Double.compare(this.longitude, p.longitude) == 0);
+	}
+
+	@Override
+	public String toString() {
+		return "( "+latitude + ", " + longitude+ " )";
 	}
 }

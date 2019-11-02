@@ -3,8 +3,10 @@ package uk.ac.ed.inf.powergrab;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Game {
 	private GeoJSON gameMap = null;
@@ -16,7 +18,7 @@ public class Game {
 	private double perfectScore = 0;
 
 	private static final Game GAME_INSTANCE = new Game();
-	
+
 	private Game() {}
 
 	public static Game getInstance() {
@@ -48,9 +50,15 @@ public class Game {
 	}
 	
 	public Station getNearestPositiveStation(Position pos) {
+		return getNearestPositiveStation(pos, new HashSet<Station>());
+	}
+
+	public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
 		double minDistance = Double.MAX_VALUE;
-		Station nearestStation = null; 
-		for (Station s: this.stations.values()) {
+		Station nearestStation = null;
+		Set<Station> stationsToCheck = new HashSet<Station>(this.stations.values());
+		stationsToCheck.removeAll(excludedStations);
+		for (Station s: stationsToCheck) {
 			double dist = pos.distance(s.getPosition());
 			if ((dist < minDistance) && (s.getCoins() > 0)) {
 				minDistance = dist;

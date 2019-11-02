@@ -3,22 +3,22 @@ package uk.ac.ed.inf.powergrab;
 public class Move {
     private Position positionBefore;
     private Direction moveDirection;
-    private Position positionAfter = null;
+    private Position positionAfter;
     private Double coinsAfter = null;
     private Double powerAfter = null;
     private Drone droneToMove;
-    private Station connectedStation = null;
+    private Station connectedStation;
 
     public Move(Drone droneToMove, Direction moveDirection) {
         this.positionBefore = droneToMove.getPosition();
         this.moveDirection = moveDirection;
         this.droneToMove = droneToMove;
+        this.positionAfter = this.positionBefore.nextPosition(moveDirection);
+        this.connectedStation = Game.getInstance().getConnectedStation(this.positionAfter);
     }
 
     public void move() {
-        this.positionAfter = this.positionBefore.nextPosition(moveDirection);
         this.droneToMove.position = this.positionAfter;
-        this.connectedStation = Game.getInstance().getConnectedStation(this.positionAfter);
         if (this.connectedStation != null)
             this.connectedStation.connect(droneToMove);
         droneToMove.power -= GameRules.POWER_CONSUMPTION;
