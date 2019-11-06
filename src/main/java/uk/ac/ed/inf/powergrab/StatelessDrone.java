@@ -3,7 +3,6 @@ package uk.ac.ed.inf.powergrab;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
 public class StatelessDrone extends Drone {
 
 	public StatelessDrone(Position position, long randomSeed) {
@@ -49,8 +48,5 @@ public class StatelessDrone extends Drone {
 			numMoves++;
 			this.nextMove();
 		}
-		//if (this.power < GameRules.POWER_CONSUMPTION) {
-		//	System.out.println("Out of power!");
-		//}
 	}
 }

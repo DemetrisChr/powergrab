@@ -16,7 +16,7 @@ public class CompareScores {
             System.out.println("File not found");
             return;
         }
-        System.setOut(fileOut);
+        // System.setOut(fileOut);
         LocalDate start = LocalDate.of(2019,1,1);
         LocalDate end = LocalDate.of(2021,1,1);
         System.out.println("droneType,date,score,perfectScore");

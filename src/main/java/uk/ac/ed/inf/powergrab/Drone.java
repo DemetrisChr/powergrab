@@ -42,7 +42,7 @@ public abstract class Drone {
 	
 	public Move move(Direction direction) {
 		Move theMove = new Move(this, direction);
-		theMove.move();
+		theMove.executeMove();
 		return theMove;
 	}
 
