@@ -24,12 +24,6 @@ public class Station {
 	}
 	
 	public void connect(Drone drone) {
-		if (this.coins > 0)
-			System.out.println("Connect +");
-		else if (this.coins == 0)
-			System.out.println("Connect 0");
-		else
-			System.out.println("Connect -");
 		double coinsTransfer;
 		double powerTransfer;
 		if ((this.coins < 0) && (drone.getCoins() < -this.coins))
