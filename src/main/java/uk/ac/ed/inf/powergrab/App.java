@@ -2,7 +2,6 @@ package uk.ac.ed.inf.powergrab;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 public class App 
 {
@@ -16,7 +15,16 @@ public class App
         double longitude = Double.parseDouble(args[4]);
         long randomSeed = Integer.parseInt(args[5]);
         String droneType = args[6];
+        // Run the simulation
+        try {
+            runSimulation(day, month, year, latitude, longitude, randomSeed, droneType);
+        } catch (IOException e) {
+            System.out.println("Error reading map");
+            return;
+        }
+    }
 
+    public static String runSimulation(String day, String month, String year, double latitude, double longitude, long randomSeed, String droneType) throws IOException {
         Drone drone;
         if (droneType.equals("stateful")) {
             drone = new StatefulDrone(new Position(latitude, longitude), randomSeed);
@@ -24,15 +32,7 @@ public class App
             drone = new StatelessDrone(new Position(latitude, longitude), randomSeed);
         }
         Game.getInstance().setDrone(drone);
-        try {
-            Game.getInstance().setGameMap(year, month, day);
-        } catch (MalformedURLException e) {
-            System.out.println("URL is malformed.");
-            return;
-        } catch (IOException e) {
-            System.out.println("Error reading input");
-            return;
-        }
+        Game.getInstance().setGameMap(year, month, day);
         drone.planPath();
         Game.getInstance().getGameMap().addPathToGeoJSON(drone.getPath());
         try {
@@ -40,6 +40,8 @@ public class App
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         }
-        System.out.println(droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+Game.getInstance().getPerfectScore());
+        String result = droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+Game.getInstance().getPerfectScore();
+        System.out.println(result);
+        return result;
     }
 }
