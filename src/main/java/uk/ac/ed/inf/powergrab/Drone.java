@@ -10,10 +10,19 @@ public abstract class Drone {
     protected double coins = 0;
     protected Random rnd = new Random();
     protected List<Move> moveHistory = new ArrayList<Move>();
+    protected Game game = null;
 
     public Drone(Position position, long randomSeed) {
         this.position = position;
         this.rnd.setSeed(randomSeed);
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    public Game getGame() {
+        return this.game;
     }
 
     public void charge(double powerIncr) {

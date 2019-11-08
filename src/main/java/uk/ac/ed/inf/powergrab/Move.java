@@ -8,8 +8,10 @@ public class Move {
     private Double powerAfter = null;
     private Drone droneToMove;
     private Station connectedStation = null;
+    private Game game;
 
     public Move(Drone droneToMove, Direction moveDirection) {
+        this.game = droneToMove.game;
         this.moveDirection = moveDirection;
         this.droneToMove = droneToMove;
     }
@@ -17,7 +19,7 @@ public class Move {
     public void executeMove() {
         this.positionBefore = droneToMove.getPosition();
         this.positionAfter = this.positionBefore.nextPosition(moveDirection);
-        this.connectedStation = Game.getInstance().getConnectedStation(this.positionAfter);
+        this.connectedStation = this.game.getConnectedStation(this.positionAfter);
         this.droneToMove.position = this.positionAfter;
         if (this.connectedStation != null)
             this.connectedStation.connect(droneToMove);
