@@ -15,7 +15,6 @@ public class CompareScores {
             outputFile = new PrintWriter(fileName);
         } catch (FileNotFoundException e) {
             System.out.println("Unable to find output file.");
-            return;
         }
         LocalDate start = LocalDate.of(2019,1,1);
         LocalDate end = LocalDate.of(2020,12,31);
@@ -24,7 +23,7 @@ public class CompareScores {
             String day = String.format("%02d", date.getDayOfMonth());
             String month = String.format("%02d", date.getMonthValue());
             String year = String.format("%02d", date.getYear());
-            List<String> droneTypes = Arrays.asList("stateful", "stateless");
+            List<String> droneTypes = Arrays.asList("stateless", "stateful");
             for (String droneType : droneTypes) {
                 double latitude = 55.944425;
                 double longitude = -3.188396;
