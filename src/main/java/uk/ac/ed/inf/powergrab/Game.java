@@ -31,10 +31,6 @@ public class Game {
         return perfectScore;
     }
 
-    public void setDrone(Drone drone) {
-        this.drone = drone;
-    }
-
     public void initialiseGameMap() throws IOException {
         this.gameMap = new GeoJSON(year, month, day);
         this.stations = this.gameMap.getStationsFromMap();
