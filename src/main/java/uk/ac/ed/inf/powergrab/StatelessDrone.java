@@ -18,7 +18,7 @@ public class StatelessDrone extends Drone {
         double maxCoins = Double.NEGATIVE_INFINITY;
         for (Direction d : Direction.values()) {
             Position p = this.position.nextPosition(d);
-            Station s = Game.getInstance().getConnectedStation(p);
+            Station s = this.game.getConnectedStation(p);
             double coins;
             if (p.inPlayArea()) {
                 if (s == null) {

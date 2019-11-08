@@ -31,16 +31,15 @@ public class App
         } else {
             drone = new StatelessDrone(new Position(latitude, longitude), randomSeed);
         }
-        Game.getInstance().setDrone(drone);
-        Game.getInstance().setGameMap(year, month, day);
+        Game game = new Game(year, month, day, drone);
         drone.planPath();
-        Game.getInstance().getGameMap().addPathToGeoJSON(drone.getPath());
+        game.getGameMap().addPathToGeoJSON(drone.getPath());
         try {
-            Game.getInstance().outputToFiles();
+            game.outputToFiles();
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         }
-        String result = droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+Game.getInstance().getPerfectScore();
+        String result = droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+game.getPerfectScore();
         System.out.println(result);
         return result;
     }

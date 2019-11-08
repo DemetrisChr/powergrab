@@ -9,20 +9,22 @@ import java.util.Map;
 import java.util.Set;
 
 public class Game {
-    private GeoJSON gameMap = null;
-    private Drone drone = null;
-    private Map<Position, Station> stations = null;
+    private GeoJSON gameMap;
+    private Drone drone;
+    private Map<Position, Station> stations;
     private String year;
     private String month;
     private String day;
     private double perfectScore = 0;
 
-    private static final Game GAME_INSTANCE = new Game();
 
-    private Game() {}
-
-    public static Game getInstance() {
-        return GAME_INSTANCE;
+    public Game(String year, String month, String day, Drone drone) throws IOException {
+        this.year = year;
+        this.month = month;
+        this.day = day;
+        this.drone = drone;
+        drone.setGame(this);
+        this.initialiseGameMap();
     }
 
     public double getPerfectScore() {
@@ -33,10 +35,7 @@ public class Game {
         this.drone = drone;
     }
 
-    public void setGameMap(String year, String month, String day) throws IOException {
-        this.year = year;
-        this.month = month;
-        this.day = day;
+    public void initialiseGameMap() throws IOException {
         this.gameMap = new GeoJSON(year, month, day);
         this.stations = this.gameMap.getStationsFromMap();
         double ps = 0;

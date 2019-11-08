@@ -24,7 +24,7 @@ public class StatefulDrone extends Drone {
         double maxCoins = Double.NEGATIVE_INFINITY;
         for (Direction d : Direction.values()) {
             Position p = this.position.nextPosition(d);
-            Station s = Game.getInstance().getConnectedStation(p);
+            Station s = this.game.getConnectedStation(p);
             double coins;
             if (p.inPlayArea()) {
                 if (s == null) {
@@ -78,7 +78,7 @@ public class StatefulDrone extends Drone {
                     current = p;
                 }
             }
-            Station connectedStationToCurrent = Game.getInstance().getConnectedStation(current);
+            Station connectedStationToCurrent = this.game.getConnectedStation(current);
             if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
                 return reconstructPath(cameFromDirection, cameFromPosition, current);
             open.remove(current);
@@ -93,8 +93,8 @@ public class StatefulDrone extends Drone {
                     cameFromPosition.put(neighbourPos, current);
                     gScore.put(neighbourPos, tentative_gScore);
                     // Distance from neighbourPos to the range of the target station (distance from point to circle)
-                    double distanceToTarget = Math.max(neighbourPos.distance(targetPosition) - GameRules.CONNECT_DISTANCE, 0);
-                    Station connectedStation = Game.getInstance().getConnectedStation(neighbourPos);
+                    double distanceToTarget = neighbourPos.distance(targetPosition); // Math.max(neighbourPos.distance(targetPosition) - GameRules.CONNECT_DISTANCE, 0);
+                    Station connectedStation = this.game.getConnectedStation(neighbourPos);
                     double penalty = 1;
                     if ((connectedStation != null) && (connectedStation.getCoins() < 0))
                         penalty = GameRules.NEGATIVE_STATION_PENALTY;
@@ -128,8 +128,8 @@ public class StatefulDrone extends Drone {
             if (plannedMoves == null || plannedMoves.isEmpty()) {
                 if (plannedMoves == null)
                     unreachable.add(targetStation);
-                Station connectedStation = Game.getInstance().getConnectedStation(this.position);
-                targetStation = Game.getInstance().getNearestPositiveStation(this.position, new HashSet<Station>(Arrays.asList(connectedStation)));
+                Station connectedStation = this.game.getConnectedStation(this.position);
+                targetStation = this.game.getNearestPositiveStation(this.position, new HashSet<Station>(Arrays.asList(connectedStation)));
                 if (targetStation == null) {
                     move = this.nextRandomMove();
                     plannedMoves = null;
