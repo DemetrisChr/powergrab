@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.TreeSet;
 
 public class StatefulDrone extends Drone {
 
@@ -47,60 +48,96 @@ public class StatefulDrone extends Drone {
         return new Move(this, moveDirection);
     }
 
+    static class NodeSet extends TreeSet<Node> {
+        public NodeSet() {
+            super();
+        }
+
+        public Node getIfContains(Node node) {
+            for (Node n : this)
+                if (n.equals(node)) return n;
+            return node;
+        }
+    }
+
+    static class Node implements Comparable<Node> {
+        public Position position;
+        public double f = Double.POSITIVE_INFINITY; // f = g + h
+        public double g = Double.POSITIVE_INFINITY;
+        public double h = Double.POSITIVE_INFINITY;
+        public Node cameFromNode = null;
+        public Direction cameFromDirection = null;
+        public Game game;
+
+        public Node(Position p, Game g) {
+            this.position = p;
+            this.game = g;
+        }
+
+        public int compareTo(Node otherNode) {
+            return Double.compare(this.f, otherNode.f);
+        }
+
+        public void calculateHandF(Position targetPosition) {
+            Station connectedStation = this.game.getConnectedStation(this.position);
+            double penalty = 1;
+            if ((connectedStation != null) && (connectedStation.getCoins() < 0))
+                penalty = GameRules.NEGATIVE_STATION_PENALTY;
+            this.h = penalty * this.position.distance(targetPosition);
+            this.f = this.g + this.h;
+        }
+
+        public Map<Direction, Node> expandNode() {
+            Map<Direction, Position> adjacentPositions = this.position.getAdjacentPositions();
+            Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
+            for (Direction d : adjacentPositions.keySet())
+                adjacentNodes.put(d, new Node(adjacentPositions.get(d), this.game));
+            return adjacentNodes;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null)
+                return false;
+            if (this.getClass() != o.getClass())
+                return false;
+            Node n = (Node) o;
+            return n.position.equals(this.position);
+        }
+    }
+
     private ArrayList<Move> nextBatchOfMovesToTarget(Station targetStation) {
         Position targetPosition = targetStation.getPosition();
         Position startPosition = this.position;
-        // Set of discovered positions that may need to be expanded
+        // Set of discovered nodes that may need to be expanded
         // Initially only the starting position has been discovered
-        ArrayList<Position> open = new ArrayList<Position>();
-        open.add(startPosition);
-        // Map where for Position p, cameFromPosition[p] is the position
-        // preceding it on the cheapest path to p currently known
-        HashMap<Position, Position> cameFromPosition = new HashMap<Position, Position>();
-        // Map where for Position p, cameFromDirection[p] is the move direction
-        // to reach p from the preceding position on th cheapest path to p currently known
-        HashMap<Position, Direction> cameFromDirection = new HashMap<Position, Direction>();
-        // gScore[p] is cost of cheapest path known to p (number of moves * TRAVEL_DISTANCE)
-        HashMap<Position, Double> gScore = new HashMap<Position, Double>();
-        gScore.put(startPosition, 0.0);
-        // fScore[p] = gScore[p] + euclidian distance from p to the goalPosition
-        HashMap<Position, Double> fScore = new HashMap<Position, Double>();
-        fScore.put(startPosition, startPosition.distance(targetPosition));
-
+        NodeSet open = new NodeSet();
+        Node rootNode = new Node(startPosition, this.game);
+        open.add(rootNode);
+        rootNode.g = 0;
+        rootNode.calculateHandF(targetPosition);
         while (!open.isEmpty()) {
-            double minFScore = Double.POSITIVE_INFINITY;
-            // node in open with the lowest fScore value
-            Position current = open.get(0);
-            for (Position p : open) {
-                double f = fScore.getOrDefault(p, Double.POSITIVE_INFINITY);
-                if (f <= minFScore) {
-                    minFScore = f;
-                    current = p;
-                }
-            }
-            Station connectedStationToCurrent = this.game.getConnectedStation(current);
+            Node current = open.first(); // Returns Node with lowest f
+            Station connectedStationToCurrent = this.game.getConnectedStation(current.position);
             if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
-                return reconstructPath(cameFromDirection, cameFromPosition, current);
+                return reconstructPath(current);
             open.remove(current);
-            Map<Direction, Position> adjacentPositionsToCurrent = current.getAdjacentPositions();
-            for (Direction moveDir : adjacentPositionsToCurrent.keySet()) {
-                Position neighbourPos = adjacentPositionsToCurrent.get(moveDir);
+            Map<Direction, Node> adjacentNodesToCurrent = current.expandNode();
+            for (Direction moveDir : adjacentNodesToCurrent.keySet()) {
+                Node neighbour = open.getIfContains(adjacentNodesToCurrent.get(moveDir));
                 // tentative_gScore is the distance from the start to the neighbour through current
-                double tentative_gScore = GameRules.TRAVEL_DISTANCE + gScore.getOrDefault(current, Double.POSITIVE_INFINITY);
-                if (tentative_gScore < gScore.getOrDefault(neighbourPos, Double.POSITIVE_INFINITY)) {
+                double tentative_gScore = GameRules.TRAVEL_DISTANCE + current.g;
+                if (tentative_gScore < neighbour.g) {
                     // This path to neighbour is better than any previous one recorded
-                    cameFromDirection.put(neighbourPos, moveDir);
-                    cameFromPosition.put(neighbourPos, current);
-                    gScore.put(neighbourPos, tentative_gScore);
+                    neighbour.cameFromDirection = moveDir;
+                    neighbour.cameFromNode = current;
+                    neighbour.g = tentative_gScore;
                     // Distance from neighbourPos to the range of the target station (distance from point to circle)
-                    double distanceToTarget = neighbourPos.distance(targetPosition); // Math.max(neighbourPos.distance(targetPosition) - GameRules.CONNECT_DISTANCE, 0);
-                    Station connectedStation = this.game.getConnectedStation(neighbourPos);
-                    double penalty = 1;
-                    if ((connectedStation != null) && (connectedStation.getCoins() < 0))
-                        penalty = GameRules.NEGATIVE_STATION_PENALTY;
-                    fScore.put(neighbourPos, gScore.get(neighbourPos) + penalty * distanceToTarget);
-                    if (!open.contains(neighbourPos))
-                        open.add(neighbourPos);
+                    neighbour.calculateHandF(targetPosition);
+                    if (!open.contains(neighbour))
+                        open.add(neighbour);
                 }
             }
         }
@@ -108,12 +145,12 @@ public class StatefulDrone extends Drone {
         return null;
     }
 
-    private ArrayList<Move> reconstructPath(HashMap<Position, Direction> cameFromDirection, HashMap<Position, Position> cameFromPosition, Position current) {
+    private ArrayList<Move> reconstructPath(Node current) {
         ArrayList<Move> totalPath = new ArrayList<Move>();
-        while (cameFromDirection.keySet().contains(current)) {
-            totalPath.add(new Move(this, cameFromDirection.get(current)));
-            current = cameFromPosition.get(current);
-        }
+        do {
+            totalPath.add(new Move(this, current.cameFromDirection));
+            current = current.cameFromNode;
+        } while (current.cameFromDirection != null);
         Collections.reverse(totalPath);
         return totalPath;
     }

@@ -24,7 +24,7 @@ public class CompareScores {
             String day = String.format("%02d", date.getDayOfMonth());
             String month = String.format("%02d", date.getMonthValue());
             String year = String.format("%02d", date.getYear());
-            List<String> droneTypes = Arrays.asList("stateful", "stateless");
+            List<String> droneTypes = Arrays.asList("stateless", "stateful");
             for (String droneType : droneTypes) {
                 double latitude = 55.944425;
                 double longitude = -3.188396;
