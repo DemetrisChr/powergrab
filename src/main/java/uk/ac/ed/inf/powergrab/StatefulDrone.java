@@ -1,6 +1,11 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Arrays;
 
 public class StatefulDrone extends Drone {
 
@@ -42,6 +47,18 @@ public class StatefulDrone extends Drone {
         return new Move(this, moveDirection);
     }
 
+    static class NodeSet extends HashSet<Node> {
+        public NodeSet() {
+            super();
+        }
+
+        public Node getOrAdd(Node node) {
+            for (Node n : this)
+                if (n.equals(node)) return n;
+            return node;
+        }
+    }
+
     static class Node {
         public Position position;
         public double f = Double.POSITIVE_INFINITY; // f = g + h
@@ -72,10 +89,21 @@ public class StatefulDrone extends Drone {
                 adjacentNodes.put(d, new Node(adjacentPositions.get(d), this.game));
             return adjacentNodes;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null)
+                return false;
+            if (this.getClass() != o.getClass())
+                return false;
+            Node n = (Node) o;
+            return n.position.equals(this.position);
+        }
     }
 
     private ArrayList<Move> nextBatchOfMovesToTarget(Station targetStation) {
-        System.out.println("------");
         Position targetPosition = targetStation.getPosition();
         Position startPosition = this.position;
         // Set of discovered nodes that may need to be expanded
@@ -86,13 +114,7 @@ public class StatefulDrone extends Drone {
         open.add(rootNode);
         rootNode.g = 0;
         rootNode.calculateHandF(targetPosition);
-        int loops = 0;
         while (!open.isEmpty()) {
-            loops++;
-            if (loops >= 1000) {
-                System.out.println("oops");
-                return null;
-            }
             double minFScore = Double.POSITIVE_INFINITY;
             // node in open with the lowest fScore value
             Node current = open.get(0);
@@ -102,7 +124,6 @@ public class StatefulDrone extends Drone {
                     current = node;
                 }
             }
-            System.out.println(current.position);
             Station connectedStationToCurrent = this.game.getConnectedStation(current.position);
             if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation)) {
                 return reconstructPath(closed, current);
@@ -110,8 +131,6 @@ public class StatefulDrone extends Drone {
             open.remove(current);
             closed.add(current);
             Map<Direction, Node> adjacentNodesToCurrent = current.expandNode();
-            System.out.println(adjacentNodesToCurrent.size());
-            System.out.println("before "+open.size());
             for (Direction moveDir : adjacentNodesToCurrent.keySet()) {
                 Node neighbour = adjacentNodesToCurrent.get(moveDir);
                 // tentative_gScore is the distance from the start to the neighbour through current
@@ -127,7 +146,6 @@ public class StatefulDrone extends Drone {
                         open.add(neighbour);
                 }
             }
-            System.out.println("after " + open.size());
         }
         // Open set is empty and target has not been reached
         return null;
@@ -160,10 +178,6 @@ public class StatefulDrone extends Drone {
                     plannedMoves = null;
                 } else {
                     plannedMoves = this.nextBatchOfMovesToTarget(targetStation);
-                    if (plannedMoves == null) {
-                        System.out.println(targetStation);
-                        break;
-                    }
                     move = plannedMoves.remove(0);
                 }
             } else {
