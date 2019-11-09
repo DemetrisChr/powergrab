@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Arrays;
+import java.util.TreeSet;
 
 public class StatefulDrone extends Drone {
 
@@ -47,19 +48,19 @@ public class StatefulDrone extends Drone {
         return new Move(this, moveDirection);
     }
 
-    static class NodeSet extends HashSet<Node> {
+    static class NodeSet extends TreeSet<Node> {
         public NodeSet() {
             super();
         }
 
-        public Node getOrAdd(Node node) {
+        public Node getIfContains(Node node) {
             for (Node n : this)
                 if (n.equals(node)) return n;
             return node;
         }
     }
 
-    static class Node {
+    static class Node implements Comparable<Node> {
         public Position position;
         public double f = Double.POSITIVE_INFINITY; // f = g + h
         public double g = Double.POSITIVE_INFINITY;
@@ -71,6 +72,10 @@ public class StatefulDrone extends Drone {
         public Node(Position p, Game g) {
             this.position = p;
             this.game = g;
+        }
+
+        public int compareTo(Node otherNode) {
+            return Double.compare(this.f, otherNode.f);
         }
 
         public void calculateHandF(Position targetPosition) {
@@ -108,31 +113,20 @@ public class StatefulDrone extends Drone {
         Position startPosition = this.position;
         // Set of discovered nodes that may need to be expanded
         // Initially only the starting position has been discovered
-        ArrayList<Node> open = new ArrayList<Node>();
-        ArrayList<Node> closed = new ArrayList<Node>();
+        NodeSet open = new NodeSet();
         Node rootNode = new Node(startPosition, this.game);
         open.add(rootNode);
         rootNode.g = 0;
         rootNode.calculateHandF(targetPosition);
         while (!open.isEmpty()) {
-            double minFScore = Double.POSITIVE_INFINITY;
-            // node in open with the lowest fScore value
-            Node current = open.get(0);
-            for (Node node : open) {
-                if (node.f <= minFScore) {
-                    minFScore = node.f;
-                    current = node;
-                }
-            }
+            Node current = open.first(); // Returns Node with lowest f
             Station connectedStationToCurrent = this.game.getConnectedStation(current.position);
-            if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation)) {
-                return reconstructPath(closed, current);
-            }
+            if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
+                return reconstructPath(current);
             open.remove(current);
-            closed.add(current);
             Map<Direction, Node> adjacentNodesToCurrent = current.expandNode();
             for (Direction moveDir : adjacentNodesToCurrent.keySet()) {
-                Node neighbour = adjacentNodesToCurrent.get(moveDir);
+                Node neighbour = open.getIfContains(adjacentNodesToCurrent.get(moveDir));
                 // tentative_gScore is the distance from the start to the neighbour through current
                 double tentative_gScore = GameRules.TRAVEL_DISTANCE + current.g;
                 if (tentative_gScore < neighbour.g) {
@@ -151,7 +145,7 @@ public class StatefulDrone extends Drone {
         return null;
     }
 
-    private ArrayList<Move> reconstructPath(ArrayList<Node> closed, Node current) {
+    private ArrayList<Move> reconstructPath(Node current) {
         ArrayList<Move> totalPath = new ArrayList<Move>();
         do {
             totalPath.add(new Move(this, current.cameFromDirection));
