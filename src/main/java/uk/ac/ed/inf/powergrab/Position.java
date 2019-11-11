@@ -29,6 +29,7 @@ public class Position {
         return Math.sqrt(Math.pow(this.latitude - pos.latitude, 2) + Math.pow(this.longitude - pos.longitude, 2));
     }
 
+    /**
     public Map<Direction, Position> getAdjacentPositions() {
         HashMap<Direction, Position> adjacentPositions = new HashMap<Direction, Position>();
         for (Direction d : Direction.values()) {
@@ -39,6 +40,7 @@ public class Position {
         }
         return adjacentPositions;
     }
+     **/
 
     @Override
     public boolean equals(Object o) {

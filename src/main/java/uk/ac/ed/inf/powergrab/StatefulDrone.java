@@ -5,8 +5,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
 import java.util.Arrays;
 import java.util.TreeSet;
+import java.util.LinkedList;
 
 public class StatefulDrone extends Drone {
 
@@ -26,16 +29,11 @@ public class StatefulDrone extends Drone {
         for (Direction d : Direction.values()) {
             Position p = this.position.nextPosition(d);
             Station s = this.game.getConnectedStation(p);
-            double coins;
             if (p.inPlayArea()) {
-                if (s == null) {
-                    coins = 0;
-                } else {
-                    coins = s.getCoins();
-                }
-                if (coins == maxCoins) {
+                double coins = (s == null) ? 0 : s.getCoins();
+                if (coins == maxCoins)
                     bestDirections.add(d);
-                } else if (coins > maxCoins) {
+                else if (coins > maxCoins) {
                     maxCoins = coins;
                     bestDirections.clear();
                     bestDirections.add(d);
@@ -48,26 +46,15 @@ public class StatefulDrone extends Drone {
         return new Move(this, moveDirection);
     }
 
-    static class NodeSet extends TreeSet<Node> {
-        public NodeSet() {
-            super();
-        }
-
-        public Node getIfContains(Node node) {
-            for (Node n : this)
-                if (n.equals(node)) return n;
-            return node;
-        }
-    }
-
-    static class Node implements Comparable<Node> {
+    private static class Node implements Comparable<Node> {
         public Position position;
+
+        public double g = Double.POSITIVE_INFINITY; // Distance travelled on shortest path to reach node
+        public double h = Double.POSITIVE_INFINITY; // Estimated distance to target
         public double f = Double.POSITIVE_INFINITY; // f = g + h
-        public double g = Double.POSITIVE_INFINITY;
-        public double h = Double.POSITIVE_INFINITY;
-        public Node cameFromNode = null;
-        public Direction cameFromDirection = null;
-        public Game game;
+        public Node cameFromNode = null; // Preceding node on the shortest path to this node
+        public Direction cameFromDirection = null; // Direction of travel on the shortest path, from previous node to this
+        public Game game; // The game where this node is located on
 
         public Node(Position p, Game g) {
             this.position = p;
@@ -75,7 +62,7 @@ public class StatefulDrone extends Drone {
         }
 
         public int compareTo(Node otherNode) {
-            return Double.compare(this.f, otherNode.f);
+            return Double.compare(this.f, otherNode.f); // The f score is the comparison metric between nodes
         }
 
         public void calculateHandF(Position targetPosition) {
@@ -88,10 +75,9 @@ public class StatefulDrone extends Drone {
         }
 
         public Map<Direction, Node> expandNode() {
-            Map<Direction, Position> adjacentPositions = this.position.getAdjacentPositions();
             Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
-            for (Direction d : adjacentPositions.keySet())
-                adjacentNodes.put(d, new Node(adjacentPositions.get(d), this.game));
+            for (Direction d : Direction.values())
+                adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
             return adjacentNodes;
         }
 
@@ -113,77 +99,94 @@ public class StatefulDrone extends Drone {
         }
     }
 
-    private ArrayList<Move> nextBatchOfMovesToTarget(Station targetStation) {
-        Position targetPosition = targetStation.getPosition();
+    private LinkedList<Move> nextBatchOfMovesToTarget() {
+        Position targetPosition = this.targetStation.getPosition();
         Position startPosition = this.position;
-        // Set of discovered nodes that may need to be expanded
-        // Initially only the starting position has been discovered
-        NodeSet open = new NodeSet();
+
+        TreeSet<Node> open = new TreeSet<Node>(); // Set of discovered nodes that may need to be expanded
+        TreeSet<Node> allNodes = new TreeSet<Node>(); // Set of all the nodes that have ever been encountered
+
         Node rootNode = new Node(startPosition, this.game);
+        // Add the root (starting) node to the sets
         open.add(rootNode);
+        allNodes.add(rootNode);
         rootNode.g = 0;
         rootNode.calculateHandF(targetPosition);
+
         while (!open.isEmpty()) {
-            Node current = open.first(); // Returns Node with lowest f
+            Node current = open.first(); // Current is the node with the lowest f score
+            open.remove(current); // Remove the current node from the open set
+
+            // If the drone can connect to the target station at the current node the goal has been reached
+            // and the path is returned
             Station connectedStationToCurrent = this.game.getConnectedStation(current.position);
             if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
                 return reconstructPath(current);
-            open.remove(current);
+
+            // As the target station has not been reached expand the current node
             Map<Direction, Node> adjacentNodesToCurrent = current.expandNode();
+
             for (Direction moveDir : adjacentNodesToCurrent.keySet()) {
-                Node neighbour = open.getIfContains(adjacentNodesToCurrent.get(moveDir));
-                // tentative_gScore is the distance from the start to the neighbour through current
-                double tentative_gScore = GameRules.TRAVEL_DISTANCE + current.g;
-                if (tentative_gScore < neighbour.g) {
+                Node neighbour = adjacentNodesToCurrent.get(moveDir);
+                boolean nodeAlreadyExists = false;
+                // If an equivalent node (same position) has been seen before, use the existing node object instead
+                for (Node n : allNodes)
+                    if (n.equals(neighbour)) {
+                        neighbour = n;
+                        nodeAlreadyExists = true;
+                        break;
+                    }
+                if (!nodeAlreadyExists) allNodes.add(neighbour);
+                double tentativeGscore = GameRules.TRAVEL_DISTANCE + current.g; // Distance from start to neighbour through current
+                if (tentativeGscore < neighbour.g) {
                     // This path to neighbour is better than any previous one recorded
                     neighbour.cameFromDirection = moveDir;
                     neighbour.cameFromNode = current;
-                    neighbour.g = tentative_gScore;
-                    // Distance from neighbourPos to the range of the target station (distance from point to circle)
+                    neighbour.g = tentativeGscore;
+                    // Calculate the heuristic (h) and f
                     neighbour.calculateHandF(targetPosition);
-                    if (!open.contains(neighbour))
-                        open.add(neighbour);
+                    if (!open.contains(neighbour)) open.add(neighbour);
                 }
             }
         }
-        // Open set is empty and target has not been reached
-        return null;
+        return null; // Open set is empty and target has not been reached
     }
 
-    private ArrayList<Move> reconstructPath(Node current) {
-        ArrayList<Move> totalPath = new ArrayList<Move>();
+    private LinkedList<Move> reconstructPath(Node current) {
+        LinkedList<Move> totalPath = new LinkedList<Move>();
         do {
-            totalPath.add(new Move(this, current.cameFromDirection));
+            totalPath.addFirst(new Move(this, current.cameFromDirection));
             current = current.cameFromNode;
         } while (current.cameFromDirection != null);
-        Collections.reverse(totalPath);
         return totalPath;
     }
 
     public void planPath() {
         int numMoves = 0;
-        ArrayList<Move> plannedMoves = new ArrayList<Move>();
+        LinkedList<Move> plannedMoves = new LinkedList<Move>();
         HashSet<Station> unreachable = new HashSet<Station>();
         Move move;
+        boolean allTargetsReached = false;
+
         while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < GameRules.NUM_OF_MOVES) {
             numMoves++;
-            if (plannedMoves == null || plannedMoves.isEmpty()) {
-                if (plannedMoves == null)
-                    unreachable.add(targetStation);
-                Station connectedStation = this.game.getConnectedStation(this.position);
-                targetStation = this.game.getNearestPositiveStation(this.position, new HashSet<Station>(Arrays.asList(connectedStation)));
-                if (targetStation == null) {
-                    move = this.nextRandomMove();
-                    plannedMoves = null;
-                } else {
-                    plannedMoves = this.nextBatchOfMovesToTarget(targetStation);
-                    move = plannedMoves.remove(0);
-                }
-            } else {
-                // Get the next move to be executed
-                move = plannedMoves.remove(0);
+            // If all planned moves have been executed and there are targets left, find new target and plan moves to reach it
+            // If no targets left set allTargetsReached to true
+            if (!allTargetsReached && plannedMoves.isEmpty()) {
+                do {
+                    this.targetStation = this.game.getNearestPositiveStation(this.position, unreachable);
+                    if (targetStation == null) {
+                        allTargetsReached = true;
+                        break;
+                    }
+                    plannedMoves = this.nextBatchOfMovesToTarget();
+                } while (plannedMoves == null);
             }
-            // Execute the move
+            // If all targets have been reached perform a random move otherwise execute the head move of the planned moves
+            if (allTargetsReached)
+                move = this.nextRandomMove();
+            else
+                move = plannedMoves.removeFirst();
             move.executeMove();
             this.moveHistory.add(move);
         }

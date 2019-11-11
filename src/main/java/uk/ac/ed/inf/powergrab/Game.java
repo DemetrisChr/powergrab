@@ -49,10 +49,14 @@ public class Game {
     }
 
     public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
+        // Finds the nearest positive station to given position, excluding a set of stations
+        // If there are no positive stations that are not excluded, null is returned
         double minDistance = Double.MAX_VALUE;
         Station nearestStation = null;
         Set<Station> stationsToCheck = new HashSet<Station>(this.stations.values());
         stationsToCheck.removeAll(excludedStations);
+        Station connectedStation = this.getConnectedStation(pos);
+        stationsToCheck.remove(connectedStation);
         for (Station s: stationsToCheck) {
             double dist = pos.distance(s.getPosition());
             if ((dist < minDistance) && (s.getCoins() > 0)) {
