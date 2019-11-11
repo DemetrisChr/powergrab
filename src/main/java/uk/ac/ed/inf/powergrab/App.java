@@ -25,12 +25,9 @@ public class App
     }
 
     public static String runSimulation(String day, String month, String year, double latitude, double longitude, long randomSeed, String droneType) throws IOException {
-        Drone drone;
-        if (droneType.equals("stateful")) {
-            drone = new StatefulDrone(new Position(latitude, longitude), randomSeed);
-        } else {
-            drone = new StatelessDrone(new Position(latitude, longitude), randomSeed);
-        }
+        Drone drone = (droneType.equals("stateful"))
+                ? new StatefulDrone(new Position(latitude, longitude), randomSeed)
+                : new StatelessDrone(new Position(latitude, longitude), randomSeed);
         Game game = new Game(year, month, day, drone);
         drone.planPath();
         game.getGameMap().addPathToGeoJSON(drone.getPath());
