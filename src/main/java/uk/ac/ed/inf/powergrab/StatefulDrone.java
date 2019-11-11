@@ -15,87 +15,36 @@ public class StatefulDrone extends Drone {
 
     private Station targetStation = null;
 
-    public StatefulDrone(Position position, long randomSeed) {
-        super(position, randomSeed);
-    }
+    public StatefulDrone(Position position, long randomSeed) { super(position, randomSeed); }
 
-    public String getDroneType() {
-        return "stateful";
-    }
+    public void planPath() {
+        int numMoves = 0;
+        LinkedList<Move> plannedMoves = new LinkedList<Move>();
+        HashSet<Station> unreachable = new HashSet<Station>();
+        Move move;
+        boolean allTargetsReached = false;
 
-    public Move nextRandomMove() {
-        ArrayList<Direction> bestDirections = new ArrayList<Direction>();
-        double maxCoins = Double.NEGATIVE_INFINITY;
-        for (Direction d : Direction.values()) {
-            Position p = this.position.nextPosition(d);
-            Station s = this.game.getConnectedStation(p);
-            if (p.inPlayArea()) {
-                double coins = (s == null) ? 0 : s.getCoins();
-                if (coins == maxCoins)
-                    bestDirections.add(d);
-                else if (coins > maxCoins) {
-                    maxCoins = coins;
-                    bestDirections.clear();
-                    bestDirections.add(d);
-                }
+        while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < GameRules.NUM_OF_MOVES) {
+            numMoves++;
+            // If all planned moves have been executed and there are targets left, find new target and plan moves to reach it
+            // If no targets left set allTargetsReached to true
+            if (!allTargetsReached && plannedMoves.isEmpty()) {
+                do {
+                    this.targetStation = this.game.getNearestPositiveStation(this.position, unreachable);
+                    if (targetStation == null) {
+                        allTargetsReached = true;
+                        break;
+                    }
+                    plannedMoves = this.nextBatchOfMovesToTarget();
+                } while (plannedMoves == null);
             }
-        }
-        // Direction moveDirection = bestDirections.get(this.rnd.nextInt(bestDirections.size()));
-        Collections.shuffle(bestDirections, this.rnd);
-        Direction moveDirection = bestDirections.get(0);
-        return new Move(this, moveDirection);
-    }
-
-    private static class Node implements Comparable<Node> {
-        public Position position;
-
-        public double g = Double.POSITIVE_INFINITY; // Distance travelled on shortest path to reach node
-        public double h = Double.POSITIVE_INFINITY; // Estimated distance to target
-        public double f = Double.POSITIVE_INFINITY; // f = g + h
-        public Node cameFromNode = null; // Preceding node on the shortest path to this node
-        public Direction cameFromDirection = null; // Direction of travel on the shortest path, from previous node to this
-        public Game game; // The game where this node is located on
-
-        public Node(Position p, Game g) {
-            this.position = p;
-            this.game = g;
-        }
-
-        public int compareTo(Node otherNode) {
-            return Double.compare(this.f, otherNode.f); // The f score is the comparison metric between nodes
-        }
-
-        public void calculateHandF(Position targetPosition) {
-            Station connectedStation = this.game.getConnectedStation(this.position);
-            double penalty = 1;
-            if ((connectedStation != null) && (connectedStation.getCoins() < 0))
-                penalty = GameRules.NEGATIVE_STATION_PENALTY;
-            this.h = penalty * this.position.distance(targetPosition);
-            this.f = this.g + this.h;
-        }
-
-        public Map<Direction, Node> expandNode() {
-            Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
-            for (Direction d : Direction.values())
-                adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
-            return adjacentNodes;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o)
-                return true;
-            if (o == null)
-                return false;
-            if (this.getClass() != o.getClass())
-                return false;
-            Node n = (Node) o;
-            return n.position.equals(this.position);
-        }
-
-        @Override
-        public int hashCode() {
-            return this.position.hashCode();
+            // If all targets have been reached perform a random move otherwise execute the head move of the planned moves
+            if (allTargetsReached)
+                move = this.nextRandomMove();
+            else
+                move = plannedMoves.removeFirst();
+            move.executeMove();
+            this.moveHistory.add(move);
         }
     }
 
@@ -161,34 +110,81 @@ public class StatefulDrone extends Drone {
         return totalPath;
     }
 
-    public void planPath() {
-        int numMoves = 0;
-        LinkedList<Move> plannedMoves = new LinkedList<Move>();
-        HashSet<Station> unreachable = new HashSet<Station>();
-        Move move;
-        boolean allTargetsReached = false;
-
-        while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < GameRules.NUM_OF_MOVES) {
-            numMoves++;
-            // If all planned moves have been executed and there are targets left, find new target and plan moves to reach it
-            // If no targets left set allTargetsReached to true
-            if (!allTargetsReached && plannedMoves.isEmpty()) {
-                do {
-                    this.targetStation = this.game.getNearestPositiveStation(this.position, unreachable);
-                    if (targetStation == null) {
-                        allTargetsReached = true;
-                        break;
-                    }
-                    plannedMoves = this.nextBatchOfMovesToTarget();
-                } while (plannedMoves == null);
+    private Move nextRandomMove() {
+        ArrayList<Direction> bestDirections = new ArrayList<Direction>();
+        double maxCoins = Double.NEGATIVE_INFINITY;
+        for (Direction d : Direction.values()) {
+            Position p = this.position.nextPosition(d);
+            Station s = this.game.getConnectedStation(p);
+            if (p.inPlayArea()) {
+                double coins = (s == null) ? 0 : s.getCoins();
+                if (coins == maxCoins)
+                    bestDirections.add(d);
+                else if (coins > maxCoins) {
+                    maxCoins = coins;
+                    bestDirections.clear();
+                    bestDirections.add(d);
+                }
             }
-            // If all targets have been reached perform a random move otherwise execute the head move of the planned moves
-            if (allTargetsReached)
-                move = this.nextRandomMove();
-            else
-                move = plannedMoves.removeFirst();
-            move.executeMove();
-            this.moveHistory.add(move);
+        }
+        // Direction moveDirection = bestDirections.get(this.rnd.nextInt(bestDirections.size()));
+        Collections.shuffle(bestDirections, this.rnd);
+        Direction moveDirection = bestDirections.get(0);
+        return new Move(this, moveDirection);
+    }
+
+    public String getDroneType() { return "stateful"; }
+
+    private static class Node implements Comparable<Node> {
+        public Position position;
+
+        public double g = Double.POSITIVE_INFINITY; // Distance travelled on shortest path to reach node
+        public double h = Double.POSITIVE_INFINITY; // Estimated distance to target
+        public double f = Double.POSITIVE_INFINITY; // f = g + h
+        public Node cameFromNode = null; // Preceding node on the shortest path to this node
+        public Direction cameFromDirection = null; // Direction of travel on the shortest path, from previous node to this
+        public Game game; // The game where this node is located on
+
+        public Node(Position p, Game g) {
+            this.position = p;
+            this.game = g;
+        }
+
+        public int compareTo(Node otherNode) {
+            return Double.compare(this.f, otherNode.f); // The f score is the comparison metric between nodes
+        }
+
+        public void calculateHandF(Position targetPosition) {
+            Station connectedStation = this.game.getConnectedStation(this.position);
+            double penalty = 1;
+            if ((connectedStation != null) && (connectedStation.getCoins() < 0))
+                penalty = GameRules.NEGATIVE_STATION_PENALTY;
+            this.h = penalty * this.position.distance(targetPosition);
+            this.f = this.g + this.h;
+        }
+
+        public Map<Direction, Node> expandNode() {
+            Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
+            for (Direction d : Direction.values())
+                adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
+            return adjacentNodes;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null)
+                return false;
+            if (this.getClass() != o.getClass())
+                return false;
+            Node n = (Node) o;
+            return n.position.equals(this.position);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.position.hashCode();
         }
     }
 }
