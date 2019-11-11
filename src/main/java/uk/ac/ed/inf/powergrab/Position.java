@@ -57,4 +57,9 @@ public class Position {
     public String toString() {
         return "( "+latitude + ", " + longitude+ " )";
     }
+
+    @Override
+    public int hashCode() {
+        return Double.hashCode(this.latitude) ^ Double.hashCode(this.longitude);
+    }
 }

@@ -106,6 +106,11 @@ public class StatefulDrone extends Drone {
             Node n = (Node) o;
             return n.position.equals(this.position);
         }
+
+        @Override
+        public int hashCode() {
+            return this.position.hashCode();
+        }
     }
 
     private ArrayList<Move> nextBatchOfMovesToTarget(Station targetStation) {
