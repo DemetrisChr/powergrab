@@ -11,17 +11,11 @@ public class Station {
         this.power = power;
     }
 
-    public Position getPosition() {
-        return position;
-    }
+    public Position getPosition() { return position; }
 
-    public double getCoins() {
-        return coins;
-    }
+    public double getCoins() { return coins; }
 
-    public double getPower() {
-        return power;
-    }
+    public double getPower() { return power; }
 
     public void connect(Drone drone) {
         double coinsTransfer;
@@ -40,9 +34,8 @@ public class Station {
         this.coins -= coinsTransfer;
     }
 
-    public String toString() {
-        return "Station at "+this.position.latitude+" , "+this.position.longitude;
-    }
+    @Override
+    public String toString() { return "Station at "+this.position.latitude+" , "+this.position.longitude; }
 
     @Override
     public boolean equals(Object o) {

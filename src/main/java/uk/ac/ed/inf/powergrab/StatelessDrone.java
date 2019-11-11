@@ -7,7 +7,15 @@ public class StatelessDrone extends Drone {
 
     public StatelessDrone(Position position, long randomSeed) { super(position, randomSeed); }
 
-    public String getDroneType() { return "stateless"; }
+    public void planPath() {
+        int numMoves = 0;
+        while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < 250) {
+            numMoves++;
+            Move move = this.nextMove();
+            move.executeMove();
+            this.moveHistory.add(move);
+        }
+    }
 
     public Move nextMove() {
         ArrayList<Direction> bestDirections = new ArrayList<Direction>();
@@ -32,13 +40,5 @@ public class StatelessDrone extends Drone {
         return new Move(this, moveDirection);
     }
 
-    public void planPath() {
-        int numMoves = 0;
-        while (this.power >= GameRules.POWER_CONSUMPTION && numMoves < 250) {
-            numMoves++;
-            Move move = this.nextMove();
-            move.executeMove();
-            this.moveHistory.add(move);
-        }
-    }
+    public String getDroneType() { return "stateless"; }
 }

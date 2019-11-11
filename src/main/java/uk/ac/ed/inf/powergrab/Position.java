@@ -29,19 +29,6 @@ public class Position {
         return Math.sqrt(Math.pow(this.latitude - pos.latitude, 2) + Math.pow(this.longitude - pos.longitude, 2));
     }
 
-    /**
-    public Map<Direction, Position> getAdjacentPositions() {
-        HashMap<Direction, Position> adjacentPositions = new HashMap<Direction, Position>();
-        for (Direction d : Direction.values()) {
-            Position p = this.nextPosition(d);
-            if (p.inPlayArea()) {
-                adjacentPositions.put(d, p);
-            }
-        }
-        return adjacentPositions;
-    }
-     **/
-
     @Override
     public boolean equals(Object o) {
         if (this == o)
@@ -56,12 +43,8 @@ public class Position {
     }
 
     @Override
-    public String toString() {
-        return "( "+latitude + ", " + longitude+ " )";
-    }
+    public String toString() { return "( "+latitude + ", " + longitude+ " )"; }
 
     @Override
-    public int hashCode() {
-        return Double.hashCode(this.latitude) ^ Double.hashCode(this.longitude);
-    }
+    public int hashCode() { return Double.hashCode(this.latitude) ^ Double.hashCode(this.longitude); }
 }

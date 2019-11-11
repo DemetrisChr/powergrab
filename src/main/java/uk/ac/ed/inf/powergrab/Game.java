@@ -87,7 +87,7 @@ public class Game {
     public void outputToFiles() throws FileNotFoundException {
         String fileName = "./outputs/"+drone.getDroneType()+"-"+day+"-"+month+"-"+year;
         PrintWriter outputGeoJson = new PrintWriter(fileName+".geojson");
-        outputGeoJson.println(gameMap.getFeatureCollection().toJson());
+        outputGeoJson.println(gameMap);
         outputGeoJson.close();
         PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
         List<Move> moveHistory = drone.getMoveHistory();

@@ -94,7 +94,7 @@ public class StatefulDrone extends Drone {
                     neighbour.g = tentativeGscore;
                     // Calculate the heuristic (h) and f
                     neighbour.calculateHandF(targetPosition);
-                    if (!open.contains(neighbour)) open.add(neighbour);
+                    open.add(neighbour); // As 'open' is a set, if 'open' already contains neighbour it will not be added
                 }
             }
         }

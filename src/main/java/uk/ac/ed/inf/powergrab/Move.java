@@ -32,6 +32,7 @@ public class Move {
         return this.connectedStation;
     }
 
+    @Override
     public String toString() {
         return this.positionBefore.latitude + "," +
                 this.positionBefore.longitude + "," +
@@ -42,23 +43,7 @@ public class Move {
                 this.powerAfter;
     }
 
-    public Position getPositionAfter() {
-        return positionAfter;
-    }
+    public Position getPositionAfter() { return positionAfter; }
 
-    public Position getPositionBefore() {
-        return positionBefore;
-    }
-
-    public Direction getMoveDirection() {
-        return this.moveDirection;
-    }
-
-    public double getCoinsAfter() {
-        return coinsAfter;
-    }
-
-    public double getPowerAfter() {
-        return powerAfter;
-    }
+    public Position getPositionBefore() { return positionBefore; }
 }

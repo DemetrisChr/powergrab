@@ -28,7 +28,7 @@ public enum Direction {
         this.cosine = Math.cos(this.angle);
     }
 
-    public double getAngle( ) {
+    public double getAngle() {
         return angle;
     }
 }

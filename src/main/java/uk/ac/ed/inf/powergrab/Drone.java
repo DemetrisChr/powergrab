@@ -6,7 +6,7 @@ import java.util.Random;
 
 public abstract class Drone {
     protected Position position;
-    protected double power = 250;
+    protected double power = GameRules.INITIAL_POWER;
     protected double coins = 0;
     protected Random rnd = new Random();
     protected List<Move> moveHistory = new ArrayList<Move>();

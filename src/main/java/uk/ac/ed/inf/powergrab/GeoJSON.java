@@ -62,7 +62,8 @@ public class GeoJSON {
         fc.features().add(f);
     }
 
-    public FeatureCollection getFeatureCollection() {
-        return fc;
+    @Override
+    public String toString() {
+        return this.fc.toJson();
     }
 }
