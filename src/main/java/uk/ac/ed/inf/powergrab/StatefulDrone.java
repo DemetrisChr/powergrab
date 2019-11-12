@@ -157,7 +157,7 @@ public class StatefulDrone extends Drone {
         public void calculateHandF(Position targetPosition) {
             Station connectedStation = this.game.getConnectedStation(this.position);
             double penalty = (connectedStation != null && connectedStation.getCoins() < 0)
-                    ? Math.abs(Math.min(Math.min(connectedStation.getCoins(), connectedStation.getPower()), 1))
+                    ? Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY, Math.abs(Math.min(connectedStation.getCoins(), connectedStation.getPower())))
                     : 1 ;
             this.h = penalty * this.position.distance(targetPosition);
             this.f = this.g + this.h;

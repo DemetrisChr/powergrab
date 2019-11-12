@@ -7,6 +7,7 @@ public class GameRules {
     public static final int NUM_RECENT_POSITIONS = 5;
     public static final int NUM_OF_MOVES = 250;
     public static final double INITIAL_POWER = 250;
+    public static final double MIN_NEGATIVE_STATION_PENALTY = 5;
 
     // Play area boundaries
     public static final double TOP = 55.946233;
