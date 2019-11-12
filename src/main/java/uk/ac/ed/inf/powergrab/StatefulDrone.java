@@ -1,15 +1,6 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.List;
-import java.util.Set;
-import java.util.Arrays;
-import java.util.TreeSet;
-import java.util.LinkedList;
+import java.util.*;
 
 public class StatefulDrone extends Drone {
 
@@ -156,9 +147,10 @@ public class StatefulDrone extends Drone {
 
         public void calculateHandF(Position targetPosition) {
             Station connectedStation = this.game.getConnectedStation(this.position);
-            double penalty = (connectedStation != null && connectedStation.getCoins() < 0)
-                    ? Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY, Math.abs(Math.min(connectedStation.getCoins(), connectedStation.getPower())))
-                    : 1 ;
+            double penalty = 1;
+            if (connectedStation != null && connectedStation.getCoins() < 0)
+                penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
+                        Math.abs(Math.min(connectedStation.getCoins(), connectedStation.getPower())));
             this.h = penalty * this.position.distance(targetPosition);
             this.f = this.g + this.h;
         }
