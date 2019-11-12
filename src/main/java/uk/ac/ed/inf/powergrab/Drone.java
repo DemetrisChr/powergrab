@@ -21,10 +21,6 @@ public abstract class Drone {
         this.game = game;
     }
 
-    public Game getGame() {
-        return this.game;
-    }
-
     public void charge(double powerIncr) {
         this.power += powerIncr;
     }
@@ -48,12 +44,6 @@ public abstract class Drone {
     public abstract void planPath();
 
     public abstract String getDroneType();
-
-    public Move move(Direction direction) {
-        Move theMove = new Move(this, direction);
-        theMove.executeMove();
-        return theMove;
-    }
 
     public List<Move> getMoveHistory() {
         return this.moveHistory;

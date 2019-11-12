@@ -28,10 +28,6 @@ public class Move {
         this.coinsAfter = droneToMove.getCoins();
     }
 
-    public Station getConnectedStation() {
-        return this.connectedStation;
-    }
-
     @Override
     public String toString() {
         return this.positionBefore.latitude + "," +

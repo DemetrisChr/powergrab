@@ -44,10 +44,6 @@ public class Game {
         return this.gameMap;
     }
 
-    public Station getNearestPositiveStation(Position pos) {
-        return getNearestPositiveStation(pos, new HashSet<Station>());
-    }
-
     public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
         // Finds the nearest positive station to given position, excluding a set of stations
         // If there are no positive stations that are not excluded, null is returned
