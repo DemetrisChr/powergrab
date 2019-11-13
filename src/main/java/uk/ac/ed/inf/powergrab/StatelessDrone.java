@@ -17,7 +17,7 @@ public class StatelessDrone extends Drone {
         }
     }
 
-    public Move nextMove() {
+    private Move nextMove() {
         ArrayList<Direction> bestDirections = new ArrayList<Direction>();
         double maxCoins = Double.NEGATIVE_INFINITY;
         for (Direction d : Direction.values()) {
