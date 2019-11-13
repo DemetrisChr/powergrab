@@ -30,8 +30,10 @@ public class StatefulDrone extends Drone {
                 } while (plannedMoves == null);
             }
             // If all targets have been reached perform a random move otherwise execute the head move of the planned moves
-            if (allTargetsReached)
-                move = this.nextRandomMove();
+            if (allTargetsReached) {
+                Direction oppositeDirectionFromLastMove = this.moveHistory.get(this.moveHistory.size() - 1).getMoveDirection().getOppositeDirection();
+                move = new Move(this, oppositeDirectionFromLastMove);
+            }
             else
                 move = plannedMoves.removeFirst();
             move.executeMove();
@@ -101,29 +103,6 @@ public class StatefulDrone extends Drone {
         return totalPath;
     }
 
-    private Move nextRandomMove() {
-        ArrayList<Direction> bestDirections = new ArrayList<Direction>();
-        double maxCoins = Double.NEGATIVE_INFINITY;
-        for (Direction d : Direction.values()) {
-            Position p = this.position.nextPosition(d);
-            Station s = this.game.getConnectedStation(p);
-            if (p.inPlayArea()) {
-                double coins = (s == null) ? 0 : s.getCoins();
-                if (coins == maxCoins)
-                    bestDirections.add(d);
-                else if (coins > maxCoins) {
-                    maxCoins = coins;
-                    bestDirections.clear();
-                    bestDirections.add(d);
-                }
-            }
-        }
-        // Direction moveDirection = bestDirections.get(this.rnd.nextInt(bestDirections.size()));
-        Collections.shuffle(bestDirections, this.rnd);
-        Direction moveDirection = bestDirections.get(0);
-        return new Move(this, moveDirection);
-    }
-
     public String getDroneType() { return "stateful"; }
 
     private static class Node implements Comparable<Node> {
@@ -175,8 +154,6 @@ public class StatefulDrone extends Drone {
         }
 
         @Override
-        public int hashCode() {
-            return this.position.hashCode();
-        }
+        public int hashCode() { return this.position.hashCode(); }
     }
 }

@@ -28,7 +28,27 @@ public enum Direction {
         this.cosine = Math.cos(this.angle);
     }
 
-    public double getAngle() {
-        return angle;
+    public Direction getOppositeDirection() {
+        switch (this) {
+            case N:   return S;
+            case NNE: return SSW;
+            case NE:  return SW;
+            case ENE: return WSW;
+            case E:   return W;
+            case ESE: return WNW;
+            case SE:  return NW;
+            case SSE: return NNW;
+            case S:   return N;
+            case SSW: return NNE;
+            case SW:  return NE;
+            case WSW: return ENE;
+            case W:   return E;
+            case WNW: return ESE;
+            case NW:  return SE;
+            case NNW: return SSE;
+            default:  throw new RuntimeException();
+        }
     }
+
+    public double getAngle() { return angle; }
 }

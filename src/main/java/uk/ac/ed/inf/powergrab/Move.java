@@ -39,6 +39,8 @@ public class Move {
                 this.powerAfter;
     }
 
+    public Direction getMoveDirection() { return moveDirection; }
+
     public Position getPositionAfter() { return positionAfter; }
 
     public Position getPositionBefore() { return positionBefore; }
