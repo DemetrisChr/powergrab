@@ -4,7 +4,6 @@ public class GameRules {
     public static final double CONNECT_DISTANCE = 0.00025;
     public static final double POWER_CONSUMPTION = 1.25;
     public static final double TRAVEL_DISTANCE = 0.0003;
-    public static final int NUM_RECENT_POSITIONS = 5;
     public static final int NUM_OF_MOVES = 250;
     public static final double INITIAL_POWER = 250;
     public static final double MIN_NEGATIVE_STATION_PENALTY = 5;
