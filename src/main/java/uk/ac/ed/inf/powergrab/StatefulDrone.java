@@ -136,8 +136,11 @@ public class StatefulDrone extends Drone {
 
         public Map<Direction, Node> expandNode() {
             Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
-            for (Direction d : Direction.values())
-                adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
+            for (Direction d : Direction.values()) {
+                Position pos = this.position.nextPosition(d);
+                if (pos.inPlayArea())
+                    adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
+            }
             return adjacentNodes;
         }
 
