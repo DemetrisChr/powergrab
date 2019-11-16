@@ -28,7 +28,7 @@ public class App {
                 : new StatelessDrone(new Position(latitude, longitude), randomSeed);
         Game game = new Game(year, month, day, drone);
         drone.planPath();
-        game.getGameMap().addPathToGeoJSON(drone.getPath());
+        game.addPathToMap();
         try {
             game.outputToFiles();
         } catch (FileNotFoundException e) {

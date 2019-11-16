@@ -52,7 +52,8 @@ public class GeoJSON {
         return stations;
     }
 
-    public void addPathToGeoJSON(List<Position> pathPositions) {
+    public void addDronePathToGeoJSON(Drone drone) {
+        List<Position> pathPositions = drone.getPath();
         ArrayList<Point> pointsList = new ArrayList<Point>();
         for (Position pos : pathPositions) {
             pointsList.add(Point.fromLngLat(pos.longitude, pos.latitude));

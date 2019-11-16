@@ -40,6 +40,10 @@ public class Game {
         this.perfectScore = ps;
     }
 
+    public void addPathToMap() {
+        this.gameMap.addDronePathToGeoJSON(drone);
+    }
+
     public GeoJSON getGameMap() {
         return this.gameMap;
     }
