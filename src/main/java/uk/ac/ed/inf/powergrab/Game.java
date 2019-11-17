@@ -3,6 +3,8 @@ package uk.ac.ed.inf.powergrab;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +29,7 @@ public class Game {
         this.initialiseGameMap();
     }
 
-    public double getPerfectScore() {
-        return perfectScore;
-    }
-
-    public void initialiseGameMap() throws IOException {
+    private void initialiseGameMap() throws IOException {
         this.gameMap = new GeoJSON(year, month, day);
         this.stations = this.gameMap.getStationsFromMap();
         double ps = 0;
@@ -40,48 +38,25 @@ public class Game {
         this.perfectScore = ps;
     }
 
-    public void addPathToMap() {
-        this.gameMap.addDronePathToGeoJSON(drone);
-    }
-
-    public GeoJSON getGameMap() {
-        return this.gameMap;
+    public Station getConnectedStation(Position pos) {
+        Station connectedStation = Collections.min(this.stations.values(), Comparator.comparing(s -> pos.distance(s.getPosition())));
+        if (connectedStation.getPosition().distance(pos) < GameRules.CONNECT_DISTANCE)
+            return connectedStation;
+        else
+            return null;
     }
 
     public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
         // Finds the nearest positive station to given position, excluding a set of stations
         // If there are no positive stations that are not excluded, null is returned
-        double minDistance = Double.MAX_VALUE;
-        Station nearestStation = null;
         Set<Station> stationsToCheck = new HashSet<Station>(this.stations.values());
         stationsToCheck.removeAll(excludedStations);
-        Station connectedStation = this.getConnectedStation(pos);
-        stationsToCheck.remove(connectedStation);
-        for (Station s: stationsToCheck) {
-            double dist = pos.distance(s.getPosition());
-            if ((dist < minDistance) && (s.getCoins() > 0)) {
-                minDistance = dist;
-                nearestStation = s;
-            }
-        }
-        return nearestStation;
-    }
-
-    public Station getConnectedStation(Position pos) {
-        Station connectedStation = null;
-        double distanceFromDrone = Double.MAX_VALUE;
-        for (Position stationPosition : this.stations.keySet()) {
-            double dist = pos.distance(stationPosition);
-            if (dist < distanceFromDrone) {
-                connectedStation = this.stations.get(stationPosition);
-                distanceFromDrone = dist;
-            }
-        }
-        if (distanceFromDrone < GameRules.CONNECT_DISTANCE) {
-            return connectedStation;
-        } else {
+        stationsToCheck.remove(this.getConnectedStation(pos));
+        stationsToCheck.removeIf(s -> s.getCoins() <= 0);
+        if (stationsToCheck.isEmpty())
             return null;
-        }
+        else
+            return Collections.min(stationsToCheck, Comparator.comparing(s -> pos.distance(s.getPosition())));
     }
 
     public void outputToFiles() throws FileNotFoundException {
@@ -95,4 +70,8 @@ public class Game {
             outputMoveHistory.println(move);
         outputMoveHistory.close();
     }
+
+    public void addPathToMap() { this.gameMap.addDronePathToGeoJSON(drone); }
+
+    public double getPerfectScore() { return perfectScore; }
 }
