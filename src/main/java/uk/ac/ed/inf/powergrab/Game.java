@@ -7,13 +7,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class Game {
     private GeoJSON gameMap;
     private Drone drone;
-    private Map<Position, Station> stations;
+    private Set<Station> stations;
     private String year;
     private String month;
     private String day;
@@ -32,15 +31,14 @@ public class Game {
     private void initialiseGameMap() throws IOException {
         this.gameMap = new GeoJSON(year, month, day);
         this.stations = this.gameMap.getStationsFromMap();
-        double ps = 0;
-        for (Station s : stations.values())
-            ps += Math.max(0, s.getCoins());
-        this.perfectScore = ps;
+        for (Station s : stations)
+            this.perfectScore += Math.max(0, s.getCoins());
     }
 
     public Station getConnectedStation(Position pos) {
-        Station connectedStation = Collections.min(this.stations.values(), Comparator.comparing(s -> pos.distance(s.getPosition())));
-        if (connectedStation.getPosition().distance(pos) < GameRules.CONNECT_DISTANCE)
+        // Find station within range of the given position. If no such station exists, null is returned.
+        Station connectedStation = Collections.min(this.stations, Comparator.comparing(s -> s.distanceFromPosition(pos)));
+        if (connectedStation.distanceFromPosition(pos) < GameRules.CONNECT_DISTANCE)
             return connectedStation;
         else
             return null;
@@ -48,15 +46,22 @@ public class Game {
 
     public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
         // Finds the nearest positive station to given position, excluding a set of stations
-        // If there are no positive stations that are not excluded, null is returned
-        Set<Station> stationsToCheck = new HashSet<Station>(this.stations.values());
+        // If there are no positive stations found, null is returned
+        // If there is a station within range of the given position it is ignored
+        Set<Station> stationsToCheck = new HashSet<Station>(this.stations);
         stationsToCheck.removeAll(excludedStations);
         stationsToCheck.remove(this.getConnectedStation(pos));
-        stationsToCheck.removeIf(s -> s.getCoins() <= 0);
-        if (stationsToCheck.isEmpty())
-            return null;
-        else
-            return Collections.min(stationsToCheck, Comparator.comparing(s -> pos.distance(s.getPosition())));
+
+        double minDistance = Double.POSITIVE_INFINITY;
+        Station nearestPositiveStation = null;
+        for (Station s : stationsToCheck) {
+            double dist = s.distanceFromPosition(pos);
+            if ((s.getCoins() > 0) && (dist < minDistance)) {
+                minDistance = dist;
+                nearestPositiveStation = s;
+            }
+        }
+        return nearestPositiveStation;
     }
 
     public void outputToFiles() throws FileNotFoundException {

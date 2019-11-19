@@ -42,7 +42,6 @@ public class StatefulDrone extends Drone {
     }
 
     private LinkedList<Move> nextBatchOfMovesToTarget() {
-        Position targetPosition = this.targetStation.getPosition();
         Position startPosition = this.position;
 
         TreeSet<Node> open = new TreeSet<Node>(); // Set of discovered nodes that may need to be expanded
@@ -53,7 +52,7 @@ public class StatefulDrone extends Drone {
         open.add(rootNode);
         allNodes.add(rootNode);
         rootNode.g = 0;
-        rootNode.calculateHandF(targetPosition);
+        rootNode.calculateHandF(targetStation);
 
         while (!open.isEmpty()) {
             Node current = open.first(); // Current is the node with the lowest f score
@@ -86,7 +85,7 @@ public class StatefulDrone extends Drone {
                     neighbour.cameFromNode = current;
                     neighbour.g = tentativeGscore;
                     // Calculate the heuristic (h) and f
-                    neighbour.calculateHandF(targetPosition);
+                    neighbour.calculateHandF(targetStation);
                     open.add(neighbour); // As 'open' is a set, if 'open' already contains neighbour it will not be added
                 }
             }
@@ -124,13 +123,13 @@ public class StatefulDrone extends Drone {
             return Double.compare(this.f, otherNode.f); // The f score is the comparison metric between nodes
         }
 
-        public void calculateHandF(Position targetPosition) {
+        public void calculateHandF(Station targetStation) {
             Station connectedStation = this.game.getConnectedStation(this.position);
             double penalty = 1;
             if (connectedStation != null && connectedStation.getCoins() < 0)
                 penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
                         Math.abs(Math.min(connectedStation.getCoins(), connectedStation.getPower())));
-            this.h = penalty * this.position.distance(targetPosition);
+            this.h = penalty * targetStation.distanceFromPosition(this.position);
             this.f = this.g + this.h;
         }
 

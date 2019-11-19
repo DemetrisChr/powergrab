@@ -11,11 +11,9 @@ public class Station {
         this.power = power;
     }
 
-    public Position getPosition() { return position; }
-
-    public double getCoins() { return coins; }
-
-    public double getPower() { return power; }
+    public double distanceFromPosition(Position pos) {
+        return this.position.distance(pos);
+    }
 
     public void connect(Drone drone) {
         double coinsTransfer;
@@ -34,6 +32,10 @@ public class Station {
         this.coins -= coinsTransfer;
     }
 
+    public double getCoins() { return coins; }
+
+    public double getPower() { return power; }
+
     @Override
     public String toString() { return "Station at "+this.position.latitude+" , "+this.position.longitude; }
 
@@ -46,8 +48,8 @@ public class Station {
         if (this.getClass() != o.getClass())
             return false;
         Station s = (Station) o;
-        return (s.getPosition().equals(this.position))
-                && (Double.compare(s.getCoins(), this.coins) == 0)
-                && (Double.compare(s.getPower(), this.power) == 0);
+        return (s.position.equals(this.position))
+                && (Double.compare(s.coins, this.coins) == 0)
+                && (Double.compare(s.power, this.power) == 0);
     }
 }

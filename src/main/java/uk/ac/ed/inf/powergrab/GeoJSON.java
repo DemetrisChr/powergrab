@@ -13,8 +13,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
+
 
 public class GeoJSON {
     private final FeatureCollection fc;
@@ -37,8 +38,8 @@ public class GeoJSON {
         this.fc = FeatureCollection.fromJson(mapSource);
     }
 
-    public Map<Position, Station> getStationsFromMap(){
-        Map<Position, Station> stations = new HashMap<Position, Station>();
+    public Set<Station> getStationsFromMap(){
+        Set<Station> stations = new HashSet<Station>();
         for (Feature f : fc.features()) {
             double coins = f.getProperty("coins").getAsDouble();
             double power = f.getProperty("power").getAsDouble();
@@ -47,7 +48,7 @@ public class GeoJSON {
             double longitude = coordinates.get(0);
             double latitude = coordinates.get(1);
             Position pos = new Position(latitude, longitude);
-            stations.put(pos, new Station(pos, coins, power));
+            stations.add(new Station(pos, coins, power));
         }
         return stations;
     }
@@ -55,9 +56,8 @@ public class GeoJSON {
     public void addDronePathToGeoJSON(Drone drone) {
         List<Position> pathPositions = drone.getPath();
         ArrayList<Point> pointsList = new ArrayList<Point>();
-        for (Position pos : pathPositions) {
+        for (Position pos : pathPositions)
             pointsList.add(Point.fromLngLat(pos.longitude, pos.latitude));
-        }
         LineString flightPath = LineString.fromLngLats(pointsList);
         Feature f = Feature.fromGeometry(flightPath);
         fc.features().add(f);
