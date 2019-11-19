@@ -14,7 +14,6 @@ public class GameMap {
     private Set<Station> stations;
     private double perfectScore = 0;
 
-
     public GameMap(String year, String month, String day) throws IOException {
         this.geoJsonDocument = new GeoJSON(year, month, day);
         this.stations = this.geoJsonDocument.getStationsFromMap();

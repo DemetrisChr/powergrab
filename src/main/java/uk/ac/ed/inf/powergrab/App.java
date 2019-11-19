@@ -33,7 +33,6 @@ public class App {
         try {
             gameMap.outputMapToFile(fileName);
             drone.outputMoveHistoryToFile(fileName);
-
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         }
