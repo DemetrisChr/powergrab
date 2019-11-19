@@ -6,7 +6,7 @@ public class StatefulDrone extends Drone {
 
     private Station targetStation = null;
 
-    public StatefulDrone(Position position, long randomSeed) { super(position, randomSeed); }
+    public StatefulDrone(Position position, GameMap gameMap, long randomSeed) { super(position, gameMap, randomSeed); }
 
     public void planPath() {
         int numMoves = 0;
@@ -21,7 +21,7 @@ public class StatefulDrone extends Drone {
             // If no targets left set allTargetsReached to true
             if (!allTargetsReached && plannedMoves.isEmpty()) {
                 do {
-                    this.targetStation = this.game.getNearestPositiveStation(this.position, unreachable);
+                    this.targetStation = this.gameMap.getNearestPositiveStation(this.position, unreachable);
                     if (targetStation == null) {
                         allTargetsReached = true;
                         break;
@@ -47,7 +47,7 @@ public class StatefulDrone extends Drone {
         TreeSet<Node> open = new TreeSet<Node>(); // Set of discovered nodes that may need to be expanded
         TreeSet<Node> allNodes = new TreeSet<Node>(); // Set of all the nodes that have ever been encountered
 
-        Node rootNode = new Node(startPosition, this.game);
+        Node rootNode = new Node(startPosition, this.gameMap);
         // Add the root (starting) node to the sets
         open.add(rootNode);
         allNodes.add(rootNode);
@@ -60,7 +60,7 @@ public class StatefulDrone extends Drone {
 
             // If the drone can connect to the target station at the current node the goal has been reached
             // and the path is returned
-            Station connectedStationToCurrent = this.game.getConnectedStation(current.position);
+            Station connectedStationToCurrent = this.gameMap.getConnectedStation(current.position);
             if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
                 return reconstructPath(current);
 
@@ -112,11 +112,11 @@ public class StatefulDrone extends Drone {
         public double f = Double.POSITIVE_INFINITY; // f = g + h
         public Node cameFromNode = null; // Preceding node on the shortest path to this node
         public Direction cameFromDirection = null; // Direction of travel on the shortest path, from previous node to this
-        public Game game; // The game where this node is located on
+        public GameMap gameMap; // The game where this node is located on
 
-        public Node(Position p, Game g) {
+        public Node(Position p, GameMap g) {
             this.position = p;
-            this.game = g;
+            this.gameMap = g;
         }
 
         public int compareTo(Node otherNode) {
@@ -124,7 +124,7 @@ public class StatefulDrone extends Drone {
         }
 
         public void calculateHandF(Station targetStation) {
-            Station connectedStation = this.game.getConnectedStation(this.position);
+            Station connectedStation = this.gameMap.getConnectedStation(this.position);
             double penalty = 1;
             if (connectedStation != null && connectedStation.getCoins() < 0)
                 penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
@@ -138,7 +138,7 @@ public class StatefulDrone extends Drone {
             for (Direction d : Direction.values()) {
                 Position pos = this.position.nextPosition(d);
                 if (pos.inPlayArea())
-                    adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.game));
+                    adjacentNodes.put(d, new Node(this.position.nextPosition(d), this.gameMap));
             }
             return adjacentNodes;
         }

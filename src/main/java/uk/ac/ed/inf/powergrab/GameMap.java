@@ -9,28 +9,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Game {
-    private GeoJSON gameMap;
-    private Drone drone;
+public class GameMap {
+    private GeoJSON geoJsonDocument;
     private Set<Station> stations;
-    private String year;
-    private String month;
-    private String day;
     private double perfectScore = 0;
 
 
-    public Game(String year, String month, String day, Drone drone) throws IOException {
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        this.drone = drone;
-        drone.setGame(this);
-        this.initialiseGameMap();
-    }
-
-    private void initialiseGameMap() throws IOException {
-        this.gameMap = new GeoJSON(year, month, day);
-        this.stations = this.gameMap.getStationsFromMap();
+    public GameMap(String year, String month, String day) throws IOException {
+        this.geoJsonDocument = new GeoJSON(year, month, day);
+        this.stations = this.geoJsonDocument.getStationsFromMap();
         for (Station s : stations)
             this.perfectScore += Math.max(0, s.getCoins());
     }
@@ -64,19 +51,13 @@ public class Game {
         return nearestPositiveStation;
     }
 
-    public void outputToFiles() throws FileNotFoundException {
-        String fileName = "./outputs/"+drone.getDroneType()+"-"+day+"-"+month+"-"+year;
+    public void outputMapToFile(String fileName) throws FileNotFoundException {
         PrintWriter outputGeoJson = new PrintWriter(fileName+".geojson");
-        outputGeoJson.println(gameMap);
+        outputGeoJson.println(geoJsonDocument);
         outputGeoJson.close();
-        PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
-        List<Move> moveHistory = drone.getMoveHistory();
-        for (Move move : moveHistory)
-            outputMoveHistory.println(move);
-        outputMoveHistory.close();
     }
 
-    public void addPathToMap() { this.gameMap.addDronePathToGeoJSON(drone); }
+    public void addDronePathToMap(Drone drone) { this.geoJsonDocument.addDronePathToGeoJSON(drone); }
 
     public double getPerfectScore() { return perfectScore; }
 }
