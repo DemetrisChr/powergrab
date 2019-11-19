@@ -1,5 +1,8 @@
 package uk.ac.ed.inf.powergrab;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -10,15 +13,12 @@ public abstract class Drone {
     protected double coins = 0;
     protected Random rnd = new Random();
     protected List<Move> moveHistory = new ArrayList<Move>();
-    protected Game game = null;
+    protected GameMap gameMap = null;
 
-    public Drone(Position position, long randomSeed) {
+    public Drone(Position position, GameMap gameMap, long randomSeed) {
         this.position = position;
+        this.gameMap = gameMap;
         this.rnd.setSeed(randomSeed);
-    }
-
-    public void setGame(Game game) {
-        this.game = game;
     }
 
     public void charge(double powerIncr) {
@@ -56,4 +56,11 @@ public abstract class Drone {
         return path;
     }
 
+    public void outputMoveHistoryToFile(String fileName) throws FileNotFoundException {
+        PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
+        List<Move> moveHistory = this.getMoveHistory();
+        for (Move move : moveHistory)
+            outputMoveHistory.println(move);
+        outputMoveHistory.close();
+    }
 }

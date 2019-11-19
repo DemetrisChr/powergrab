@@ -5,7 +5,7 @@ import java.util.Collections;
 
 public class StatelessDrone extends Drone {
 
-    public StatelessDrone(Position position, long randomSeed) { super(position, randomSeed); }
+    public StatelessDrone(Position position, GameMap gameMap, long randomSeed) { super(position, gameMap, randomSeed); }
 
     public void planPath() {
         int numMoves = 0;
@@ -22,7 +22,7 @@ public class StatelessDrone extends Drone {
         double maxCoins = Double.NEGATIVE_INFINITY;
         for (Direction d : Direction.values()) {
             Position p = this.position.nextPosition(d);
-            Station s = this.game.getConnectedStation(p);
+            Station s = this.gameMap.getConnectedStation(p);
             if (p.inPlayArea()) {
                 double coins = (s == null) ? 0 : s.getCoins();
                 if (coins == maxCoins)

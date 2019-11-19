@@ -23,18 +23,21 @@ public class App {
     }
 
     public static String runSimulation(String day, String month, String year, double latitude, double longitude, long randomSeed, String droneType) throws IOException {
+        GameMap gameMap = new GameMap(year, month, day);
         Drone drone = (droneType.equals("stateful"))
-                ? new StatefulDrone(new Position(latitude, longitude), randomSeed)
-                : new StatelessDrone(new Position(latitude, longitude), randomSeed);
-        Game game = new Game(year, month, day, drone);
+                ? new StatefulDrone(new Position(latitude, longitude), gameMap, randomSeed)
+                : new StatelessDrone(new Position(latitude, longitude), gameMap, randomSeed);
         drone.planPath();
-        game.addPathToMap();
+        gameMap.addDronePathToMap(drone);
+        String fileName = "./outputs/"+drone.getDroneType()+"-"+day+"-"+month+"-"+year;
         try {
-            game.outputToFiles();
+            gameMap.outputMapToFile(fileName);
+            drone.outputMoveHistoryToFile(fileName);
+
         } catch (FileNotFoundException e) {
             System.out.println("File not found!");
         }
-        String result = droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+game.getPerfectScore();
+        String result = droneType+","+year+"-"+month+"-"+day+","+drone.getCoins()+","+ gameMap.getPerfectScore();
         System.out.println(result);
         return result;
     }
