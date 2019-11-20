@@ -7,10 +7,8 @@ public class Move {
     private Double coinsAfter = null;
     private Double powerAfter = null;
     private Drone droneToMove;
-    private GameMap gameMap;
 
     public Move(Drone droneToMove, Direction moveDirection) {
-        this.gameMap = droneToMove.gameMap;
         this.moveDirection = moveDirection;
         this.droneToMove = droneToMove;
     }
@@ -18,7 +16,8 @@ public class Move {
     public void executeMove() {
         this.positionBefore = droneToMove.getPosition();
         this.positionAfter = this.positionBefore.nextPosition(moveDirection);
-        Station connectedStation = this.gameMap.getConnectedStation(this.positionAfter);
+        GameMap gameMap = this.droneToMove.getGameMap();
+        Station connectedStation = gameMap.getConnectedStation(this.positionAfter);
         this.droneToMove.position = this.positionAfter;
         if (connectedStation != null)
             connectedStation.connect(droneToMove);

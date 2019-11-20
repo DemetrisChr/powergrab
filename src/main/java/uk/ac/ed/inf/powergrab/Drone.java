@@ -45,6 +45,8 @@ public abstract class Drone {
 
     public abstract String getDroneType();
 
+    public GameMap getGameMap() { return this.gameMap; }
+
     public List<Move> getMoveHistory() {
         return this.moveHistory;
     }

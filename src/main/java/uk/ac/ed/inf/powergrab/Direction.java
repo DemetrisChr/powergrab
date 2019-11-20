@@ -49,6 +49,4 @@ public enum Direction {
             default:  throw new RuntimeException();
         }
     }
-
-    public double getAngle() { return angle; }
 }
