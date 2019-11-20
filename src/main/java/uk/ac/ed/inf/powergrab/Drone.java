@@ -21,6 +21,14 @@ public abstract class Drone {
         this.rnd.setSeed(randomSeed);
     }
 
+    public void move(Direction d) {
+        this.position = this.position.nextPosition(d);
+        Station connectedStation = gameMap.getConnectedStation(this.position);
+        if (connectedStation != null)
+            connectedStation.connect(this);
+        this.power -= GameRules.POWER_CONSUMPTION;
+    }
+
     public void charge(double powerIncr) {
         this.power += powerIncr;
     }

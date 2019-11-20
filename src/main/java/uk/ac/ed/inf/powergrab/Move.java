@@ -15,13 +15,9 @@ public class Move {
 
     public void executeMove() {
         this.positionBefore = droneToMove.getPosition();
-        this.positionAfter = this.positionBefore.nextPosition(moveDirection);
-        GameMap gameMap = this.droneToMove.getGameMap();
-        Station connectedStation = gameMap.getConnectedStation(this.positionAfter);
-        this.droneToMove.position = this.positionAfter;
-        if (connectedStation != null)
-            connectedStation.connect(droneToMove);
-        droneToMove.power -= GameRules.POWER_CONSUMPTION;
+        this.positionAfter = positionBefore.nextPosition(moveDirection);
+        this.droneToMove.move(moveDirection);
+        this.positionAfter = droneToMove.getPosition();
         this.powerAfter = droneToMove.getPower();
         this.coinsAfter = droneToMove.getCoins();
     }
