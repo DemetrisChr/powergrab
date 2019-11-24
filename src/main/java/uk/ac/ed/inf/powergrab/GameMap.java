@@ -24,7 +24,7 @@ public class GameMap {
     public Station getConnectedStation(Position pos) {
         // Find station within range of the given position. If no such station exists, null is returned.
         Station connectedStation = Collections.min(this.stations, Comparator.comparing(s -> s.distanceFromPosition(pos)));
-        if (connectedStation.distanceFromPosition(pos) < GameRules.CONNECT_DISTANCE)
+        if (connectedStation.positionInRange(pos))
             return connectedStation;
         else
             return null;

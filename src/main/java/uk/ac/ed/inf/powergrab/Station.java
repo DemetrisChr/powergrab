@@ -12,24 +12,25 @@ public class Station {
     }
 
     public double distanceFromPosition(Position pos) {
+        // Calculates the euclidean distance from the given position to the position of this station
         return this.position.distance(pos);
     }
 
+    public boolean positionInRange(Position pos) {
+        // Checks whether the given position is within the range (connect distance) of this station
+        return this.distanceFromPosition(pos) < GameRules.CONNECT_DISTANCE;
+    }
+
     public void connect(Drone drone) {
-        double coinsTransfer;
-        double powerTransfer;
-        if ((this.coins < 0) && (drone.getCoins() < -this.coins))
-            coinsTransfer = - drone.getCoins();
-        else
-            coinsTransfer = this.coins;
-        if ((this.power < 0) && (drone.getPower() < -this.power))
-            powerTransfer = - drone.getPower();
-        else
-            powerTransfer = this.power;
-        drone.charge(powerTransfer);
-        drone.receiveCoins(coinsTransfer);
-        this.power -= powerTransfer;
-        this.coins -= coinsTransfer;
+        // Connects the given drone to this station. i.e. Coins & Power are given to or taken away from the drone
+        // If the station is negative and the drone has less coins/power than the absolute value of the coins/power
+        // of the station then the drone loses as many coins/power as possible, i.e. all of its coins/power
+        double coinsToTransfer = (this.coins < 0) ? Math.max(-drone.getCoins(), this.coins) : this.coins ;
+        double powerToTransfer = (this.power < 0) ? Math.max(-drone.getPower(), this.power) : this.power ;
+        drone.charge(powerToTransfer);
+        drone.receiveCoins(coinsToTransfer);
+        this.power -= powerToTransfer;
+        this.coins -= coinsToTransfer;
     }
 
     public double getCoins() { return coins; }
