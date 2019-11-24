@@ -19,6 +19,9 @@ public enum Direction {
     NNW (15 * Math.PI / 8);
 
     private final double angle;
+
+    // The sine and cosine of the angle are stored as fields to avoid unnecessary
+    // repetition of the calculation which would impact performance
     public final double sine;
     public final double cosine;
 
@@ -46,7 +49,7 @@ public enum Direction {
             case WNW: return ESE;
             case NW:  return SE;
             case NNW: return SSE;
-            default:  throw new RuntimeException();
+            default:  throw new RuntimeException(); // Should not happen since the switch is exhaustive
         }
     }
 }
