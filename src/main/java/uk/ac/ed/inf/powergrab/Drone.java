@@ -21,6 +21,8 @@ public abstract class Drone {
         this.rnd.setSeed(randomSeed);
     }
 
+    public abstract void planPath();
+
     public void move(Direction d) {
         this.position = this.position.nextPosition(d);
         Station connectedStation = gameMap.getConnectedStation(this.position);
@@ -29,34 +31,16 @@ public abstract class Drone {
         this.power -= GameRules.POWER_CONSUMPTION;
     }
 
-    public void charge(double powerIncr) {
-        this.power += powerIncr;
+    public double addPower(double deltaPower) {
+        double initialPower = this.power;
+        this.power = Math.max(0, initialPower + deltaPower);
+        return deltaPower - (this.power - initialPower);
     }
 
-    public void receiveCoins(double coinsIncr) {
-        this.coins += coinsIncr;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public double getCoins() {
-        return coins;
-    }
-
-    public double getPower() {
-        return power;
-    }
-
-    public abstract void planPath();
-
-    public abstract String getDroneType();
-
-    public GameMap getGameMap() { return this.gameMap; }
-
-    public List<Move> getMoveHistory() {
-        return this.moveHistory;
+    public double addCoins(double deltaCoins) {
+        double initialCoins = this.coins;
+        this.coins = Math.max(0, initialCoins + deltaCoins);
+        return deltaCoins - (this.coins - initialCoins);
     }
 
     public List<Position> getPath() {
@@ -68,9 +52,16 @@ public abstract class Drone {
 
     public void outputMoveHistoryToFile(String fileName) throws FileNotFoundException {
         PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
-        List<Move> moveHistory = this.getMoveHistory();
-        for (Move move : moveHistory)
+        for (Move move : this.moveHistory)
             outputMoveHistory.println(move);
         outputMoveHistory.close();
     }
+
+    public Position getPosition() { return position; }
+
+    public double getCoins() { return coins; }
+
+    public double getPower() { return power; }
+
+    public abstract String getDroneType();
 }

@@ -3,6 +3,7 @@ package uk.ac.ed.inf.powergrab;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import java.io.IOException;
 
 /**
  * Unit test for PowerGrab App.
@@ -211,6 +212,86 @@ public class AppTest extends TestCase {
         Position p5 = p4.nextPosition(Direction.WNW);
         Position stop = new Position(55.94396264116995,-3.1881340947613324);
         assertTrue(approxEq(p5, stop));
+    }
+
+    public void testConnectDroneToStationNotEnoughCoins() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, -100, -100);
+        dr.addCoins(50); // The drone has 50 coins in total
+        s.connect(dr);
+        assertTrue(approxEq(0, dr.getCoins()));
+        assertTrue(approxEq(-50, s.getCoins()));
+    }
+
+    public void testConnectDroneEnoughCoins() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, -10, -10);
+        dr.addCoins(50); // The drone has 50 coins in total
+        s.connect(dr);
+        assertTrue(approxEq(40, dr.getCoins()));
+        assertTrue(approxEq(0, s.getCoins()));
+    }
+
+    public void testConnectDroneNotEnoughPower() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, -10, -300);
+        s.connect(dr);
+        assertTrue(approxEq(0, dr.getPower()));
+        assertTrue(approxEq(-50, s.getPower()));
+    }
+
+    public void testConnectDroneEnoughPower() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, -10, -50);
+        s.connect(dr);
+        assertTrue(approxEq(200, dr.getPower()));
+        assertTrue(approxEq(0, s.getPower()));
+    }
+
+    public void testConnectDronePositivePower() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, 10, 50);
+        s.connect(dr);
+        assertTrue(approxEq(300, dr.getPower()));
+        assertTrue(approxEq(0, s.getPower()));
+    }
+
+    public void testConnectDronePositiveCoins() {
+        Drone dr;
+        try {
+            dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
+        } catch (IOException e) {
+            System.out.println("Unable to load map"); return;
+        }
+        Station s = new Station(p0, 200, 50);
+        s.connect(dr);
+        assertTrue(approxEq(200, dr.getCoins()));
+        assertTrue(approxEq(0, s.getCoins()));
     }
 
 }

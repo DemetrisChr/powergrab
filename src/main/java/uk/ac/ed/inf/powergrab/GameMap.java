@@ -42,7 +42,7 @@ public class GameMap {
         Station nearestPositiveStation = null;
         for (Station s : stationsToCheck) {
             double dist = s.distanceFromPosition(pos);
-            if ((s.getCoins() > 0) && (dist < minDistance)) {
+            if (s.isPositive() && (dist < minDistance)) {
                 minDistance = dist;
                 nearestPositiveStation = s;
             }
