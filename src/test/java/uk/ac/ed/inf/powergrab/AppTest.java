@@ -222,7 +222,7 @@ public class AppTest extends TestCase {
             System.out.println("Unable to load map"); return;
         }
         Station s = new Station(p0, -100, -100);
-        dr.addOrSubstrCoins(50); // The drone has 50 coins in total
+        dr.addOrSubtrCoins(50); // The drone has 50 coins in total
         s.connect(dr);
         assertTrue(approxEq(0, dr.getCoins()));
         assertTrue(approxEq(-50, s.getCoins()));
@@ -236,7 +236,7 @@ public class AppTest extends TestCase {
             System.out.println("Unable to load map"); return;
         }
         Station s = new Station(p0, -10, -10);
-        dr.addOrSubstrCoins(50); // The drone has 50 coins in total
+        dr.addOrSubtrCoins(50); // The drone has 50 coins in total
         s.connect(dr);
         assertTrue(approxEq(40, dr.getCoins()));
         assertTrue(approxEq(0, s.getCoins()));

@@ -31,7 +31,7 @@ public abstract class Drone {
         this.power -= GameRules.POWER_CONSUMPTION;
     }
 
-    public double addOrSubstrPower(double deltaPower) {
+    public double addOrSubtrPower(double deltaPower) {
         if (deltaPower < 0 && this.power < -deltaPower) {
             this.power = 0;
             return deltaPower + this.power;
@@ -41,7 +41,7 @@ public abstract class Drone {
         }
     }
 
-    public double addOrSubstrCoins(double deltaCoins) {
+    public double addOrSubtrCoins(double deltaCoins) {
         if (deltaCoins < 0 && this.power < -deltaCoins) {
             this.coins = 0;
             return deltaCoins + this.coins;

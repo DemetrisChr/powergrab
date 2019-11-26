@@ -25,8 +25,8 @@ public class Station {
         // Connects the given drone to this station. i.e. Coins & Power are given to or taken away from the drone
         // If the station is negative and the drone has less coins/power than the absolute value of the coins/power
         // of the station then the drone loses as many coins/power as possible, i.e. all of its coins/power
-        this.power = drone.addOrSubstrPower(this.power);
-        this.coins = drone.addOrSubstrCoins(this.coins);
+        this.power = drone.addOrSubtrPower(this.power);
+        this.coins = drone.addOrSubtrCoins(this.coins);
     }
 
     public boolean isPositive() {
