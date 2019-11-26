@@ -31,16 +31,24 @@ public abstract class Drone {
         this.power -= GameRules.POWER_CONSUMPTION;
     }
 
-    public double addPower(double deltaPower) {
-        double initialPower = this.power;
-        this.power = Math.max(0, initialPower + deltaPower);
-        return deltaPower - (this.power - initialPower);
+    public double addOrSubstrPower(double deltaPower) {
+        if (deltaPower < 0 && this.power < -deltaPower) {
+            this.power = 0;
+            return deltaPower + this.power;
+        } else {
+            this.power += deltaPower;
+            return 0;
+        }
     }
 
-    public double addCoins(double deltaCoins) {
-        double initialCoins = this.coins;
-        this.coins = Math.max(0, initialCoins + deltaCoins);
-        return deltaCoins - (this.coins - initialCoins);
+    public double addOrSubstrCoins(double deltaCoins) {
+        if (deltaCoins < 0 && this.power < -deltaCoins) {
+            this.coins = 0;
+            return deltaCoins + this.coins;
+        } else {
+            this.coins += deltaCoins;
+            return 0;
+        }
     }
 
     public List<Position> getPath() {

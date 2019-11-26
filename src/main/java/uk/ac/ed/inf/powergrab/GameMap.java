@@ -56,7 +56,7 @@ public class GameMap {
         outputGeoJson.close();
     }
 
-    public void addDronePathToMap(Drone drone) { this.geoJsonDocument.addDronePathToGeoJSON(drone); }
+    public void addDronePathToMap(Drone drone) { this.geoJsonDocument.addPathToGeoJSON(drone.getPath()); }
 
     public double getPerfectScore() { return perfectScore; }
 }
