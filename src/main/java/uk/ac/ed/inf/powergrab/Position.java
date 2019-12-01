@@ -38,8 +38,8 @@ public class Position {
         if (this.getClass() != o.getClass())
             return false;
         Position p = (Position) o;
-        return (Double.compare(this.latitude, p.latitude) == 0)
-                && (Double.compare(this.longitude, p.longitude) == 0);
+        return (Math.abs(this.latitude - p.latitude) <= 1E-07)
+                && (Math.abs(this.longitude - p.longitude) <= 1E-07);
     }
 
     @Override
