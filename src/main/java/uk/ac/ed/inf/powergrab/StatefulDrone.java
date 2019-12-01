@@ -42,14 +42,14 @@ public class StatefulDrone extends Drone {
     }
 
     private LinkedList<Move> nextBatchOfMovesToTarget() {
-        Node.newSearch(this.gameMap);
+        Node.clearNodeSet();
         PriorityQueue<Node> frontier = new PriorityQueue<Node>(); // Discovered nodes that may need to be expanded
 
         Node rootNode = Node.getNodeWithPosition(this.position);
         // Add the root (starting) node to the sets
         frontier.add(rootNode);
         rootNode.g = 0;
-        rootNode.calculateHandF(targetStation);
+        rootNode.calculateHandF(this.targetStation);
 
         while (!frontier.isEmpty()) {
             Node current = frontier.poll(); // Retrieve and remove the node with the lowest f-score
@@ -65,14 +65,15 @@ public class StatefulDrone extends Drone {
 
             for (Direction moveDir : adjacentNodesToCurrent.keySet()) {
                 Node neighbour = adjacentNodesToCurrent.get(moveDir);
-                double tentativeGscore = GameRules.TRAVEL_DISTANCE + current.g; // Distance from start to neighbour through current
+                // Calculate the distance from start to neighbour through current and add the negative station penalty
+                double tentativeGscore = current.g + GameRules.TRAVEL_DISTANCE + calculatePenalty(neighbour);
                 if (tentativeGscore < neighbour.g) {
                     // This path to neighbour is better than any previous one recorded
                     neighbour.cameFromDirection = moveDir;
                     neighbour.cameFromNode = current;
                     neighbour.g = tentativeGscore;
                     // Calculate the heuristic (h) and f
-                    neighbour.calculateHandF(targetStation);
+                    neighbour.calculateHandF(this.targetStation);
                     // If the neighbour is not already in the frontier, add it
                     if (!frontier.contains(neighbour))
                         frontier.add(neighbour);
@@ -80,6 +81,15 @@ public class StatefulDrone extends Drone {
             }
         }
         return null; // Frontier is empty and target has not been reached
+    }
+
+    public double calculatePenalty(Node node) {
+        double penalty = 0;
+        Station connectedStation = gameMap.getConnectedStation(node.position);
+        if (connectedStation != null && connectedStation.isNegative())
+            penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
+                    (-1)*(Math.min(connectedStation.getCoins(), connectedStation.getPower())));
+        return penalty;
     }
 
     private LinkedList<Move> reconstructPath(Node current) {
@@ -94,8 +104,7 @@ public class StatefulDrone extends Drone {
     public String getDroneType() { return "stateful"; }
 
     private static class Node implements Comparable<Node> {
-        public static GameMap gameMap = null;
-        public static Set<Node> allNodes = new HashSet<Node>();
+        private static Set<Node> allNodes = new HashSet<Node>();
 
         public Position position;
         public double g = Double.POSITIVE_INFINITY; // Distance travelled on shortest path to reach node
@@ -108,9 +117,8 @@ public class StatefulDrone extends Drone {
             this.position = p;
         }
 
-        public static void newSearch(GameMap gameMap) {
+        public static void clearNodeSet() {
             Node.allNodes.clear();
-            Node.gameMap = gameMap;
         }
 
         public static Node getNodeWithPosition(Position pos) {
@@ -127,12 +135,7 @@ public class StatefulDrone extends Drone {
         }
 
         public void calculateHandF(Station targetStation) {
-            Station connectedStation = gameMap.getConnectedStation(this.position);
-            double penalty = 1;
-            if (connectedStation != null && connectedStation.isNegative())
-                penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
-                        Math.abs(Math.min(connectedStation.getCoins(), connectedStation.getPower())));
-            this.h = penalty * targetStation.distanceFromPosition(this.position);
+            this.h = targetStation.distanceFromPosition(this.position);
             this.f = this.g + this.h;
         }
 
@@ -141,7 +144,7 @@ public class StatefulDrone extends Drone {
             for (Direction d : Direction.values()) {
                 Position pos = this.position.nextPosition(d);
                 if (pos.inPlayArea())
-                    adjacentNodes.put(d, Node.getNodeWithPosition(this.position.nextPosition(d)));
+                    adjacentNodes.put(d, Node.getNodeWithPosition(pos));
             }
             return adjacentNodes;
         }
