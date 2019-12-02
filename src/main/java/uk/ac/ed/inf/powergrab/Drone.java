@@ -37,8 +37,9 @@ public abstract class Drone {
     public double addOrSubtrPower(double deltaPower) {
         if (deltaPower < 0 && this.power < -deltaPower) {
             // The drone has less power than the amount to be subtracted
+            double powerBefore = this.power;
             this.power = 0;
-            return deltaPower + this.power;
+            return deltaPower + powerBefore;
         } else {
             this.power += deltaPower;
             return 0;
@@ -47,10 +48,11 @@ public abstract class Drone {
 
     // Adds or sunbtracts deltaCoins from the drone's coins (depending on the sign of deltaCoins)
     public double addOrSubtrCoins(double deltaCoins) {
-        if (deltaCoins < 0 && this.power < -deltaCoins) {
+        if ((deltaCoins < 0) && (this.coins < -deltaCoins)) {
             // The drone has less coins than the amount to be subtracted
+            double coinsBefore = this.coins;
             this.coins = 0;
-            return deltaCoins + this.coins;
+            return deltaCoins + coinsBefore;
         } else {
             this.coins += deltaCoins;
             return 0;

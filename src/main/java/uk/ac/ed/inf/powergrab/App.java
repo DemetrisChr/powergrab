@@ -36,7 +36,7 @@ public class App {
         gameMap.addDronePathToMap(drone); // Add the drone's path to the Geo-JSON document
 
         // Output the Geo-JSON document (with the added drone path) and the drone's move history to files
-        String fileName = "./outputs/"+drone.getDroneType()+"-"+day+"-"+month+"-"+year;
+        String fileName = drone.getDroneType()+"-"+day+"-"+month+"-"+year;
         gameMap.outputMapToFile(fileName);
         drone.outputMoveHistoryToFile(fileName);
 
