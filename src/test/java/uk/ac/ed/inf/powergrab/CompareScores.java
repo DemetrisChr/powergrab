@@ -9,7 +9,8 @@ import java.util.List;
 
 public class CompareScores {
     public static void main(String[] args) {
-        String fileName = "./outputs/compareScores.csv";
+        String includeDates = args[0]; // "all" or "equalDayMonth"
+        String fileName = "compareScores.csv";
         PrintWriter outputFile;
         try {
             outputFile = new PrintWriter(fileName);
@@ -24,17 +25,19 @@ public class CompareScores {
             String day = String.format("%02d", date.getDayOfMonth());
             String month = String.format("%02d", date.getMonthValue());
             String year = String.format("%02d", date.getYear());
-            List<String> droneTypes = Arrays.asList("stateless", "stateful");
-            for (String droneType : droneTypes) {
-                double latitude = 55.944425;
-                double longitude = -3.188396;
-                long randomSeed = 5678;
-                try {
-                    String result = App.runSimulation(day, month, year, latitude, longitude, randomSeed, droneType);
-                    outputFile.println(result);
-                } catch (IOException e) {
-                    System.out.println("Failed to fetch map.");
-                    return;
+            if (includeDates.equals("all") || (includeDates.equals("equalDayMonth") && day.equals(month) && year.equals("2019"))) {
+                List<String> droneTypes = Arrays.asList("stateless", "stateful");
+                for (String droneType : droneTypes) {
+                    double latitude = 55.944425;
+                    double longitude = -3.188396;
+                    long randomSeed = 5678;
+                    try {
+                        String result = App.runSimulation(day, month, year, latitude, longitude, randomSeed, droneType);
+                        outputFile.println(result);
+                    } catch (IOException e) {
+                        System.out.println("Failed to fetch map.");
+                        return;
+                    }
                 }
             }
         }
