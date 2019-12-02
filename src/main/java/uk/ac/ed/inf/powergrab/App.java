@@ -26,6 +26,8 @@ public class App {
 
     public static String runSimulation(String day, String month, String year, double latitude, double longitude, long randomSeed, String droneType) throws IOException, FileNotFoundException {
         GameMap gameMap = new GameMap(year, month, day); // Load and parse the game map
+
+        // Create the drone object (Stateful or stateless depending on the droneType argument)
         Drone drone = (droneType.equals("stateful"))
                 ? new StatefulDrone(new Position(latitude, longitude), gameMap, randomSeed)
                 : new StatelessDrone(new Position(latitude, longitude), gameMap, randomSeed);
