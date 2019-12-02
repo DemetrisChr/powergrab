@@ -20,7 +20,10 @@ import java.util.HashSet;
 public class GeoJSON {
     private final FeatureCollection fc;
 
+    // The constructor connects to the server, retrieves and parses the Geo-JSON document for the given date
+    // Throws IOException if unable to connect to server or if the URL is malformed
     public GeoJSON(String year, String month, String day) throws IOException {
+        // Connect to the server
         String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
         URL url = new URL(mapString);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -30,6 +33,8 @@ public class GeoJSON {
         conn.setDoInput(true);
         conn.connect();
 
+        // Parse the Geo-JSON document and store it as a Feature Collection
+        // (Geo-JSON documents represent a collection of geographical features)
         InputStream is = conn.getInputStream();
         InputStreamReader isReader = new InputStreamReader(is);
         JsonParser parser = new JsonParser();
@@ -38,9 +43,11 @@ public class GeoJSON {
         this.fc = FeatureCollection.fromJson(mapSource);
     }
 
+    // Returns a Set of the stations within the Geo-JSON document
     public Set<Station> getStationsFromMap(){
         Set<Station> stations = new HashSet<Station>();
         for (Feature f : fc.features()) {
+            // For each station read its coins, power & coordinates and construct a Station object with these attributes
             double coins = f.getProperty("coins").getAsDouble();
             double power = f.getProperty("power").getAsDouble();
             Point p = (Point) f.geometry();
@@ -53,6 +60,7 @@ public class GeoJSON {
         return stations;
     }
 
+    // Adds the given path (given as a list of positions) on the Geo-JSON document
     public void addPathToGeoJSON(List<Position> pathPositions) {
         ArrayList<Point> pointsList = new ArrayList<Point>();
         for (Position pos : pathPositions)

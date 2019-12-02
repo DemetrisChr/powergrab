@@ -8,7 +8,7 @@ public class StatefulDrone extends Drone {
 
     public StatefulDrone(Position position, GameMap gameMap, long randomSeed) { super(position, gameMap, randomSeed); }
 
-    public void planPath() {
+    public void findPath() {
         int numMoves = 0;
         LinkedList<Move> plannedMoves = new LinkedList<Move>();
         HashSet<Station> unreachable = new HashSet<Station>();
@@ -56,8 +56,8 @@ public class StatefulDrone extends Drone {
 
             // If the drone can connect to the target station at the current node the goal has been reached
             // and the path is returned
-            Station connectedStationToCurrent = this.gameMap.getConnectedStation(current.position);
-            if ((connectedStationToCurrent != null) && connectedStationToCurrent.equals(targetStation))
+            Station stationToConnectToCurrent = this.gameMap.getStationToConnect(current.position);
+            if ((stationToConnectToCurrent != null) && stationToConnectToCurrent.equals(targetStation))
                 return reconstructPath(current);
 
             // As the target station has not been reached expand the current node
@@ -83,15 +83,21 @@ public class StatefulDrone extends Drone {
         return null; // Frontier is empty and target has not been reached
     }
 
+    // Calculates the penalty associated with this Node. The penalty is non-zero only for nodes with position within the
+    // range of a negative station.
     public double calculatePenalty(Node node) {
         double penalty = 0;
-        Station connectedStation = gameMap.getConnectedStation(node.position);
-        if (connectedStation != null && connectedStation.isNegative())
+        Station stationToConnect = gameMap.getStationToConnect(node.position);
+        if (stationToConnect != null && stationToConnect.isNegative())
+            // The penalty is the maximum of the minimum penalty, the coins of the station multiplied by (-1) and the
+            // power of the station multiplied by (-1)
             penalty = Math.max(GameRules.MIN_NEGATIVE_STATION_PENALTY,
-                    (-1)*(Math.min(connectedStation.getCoins(), connectedStation.getPower())));
+                    (-1)*(Math.min(stationToConnect.getCoins(), stationToConnect.getPower())));
         return penalty;
     }
 
+    // Reconstructs the shortest path leading to the current node by following the cameFromNode and cameFromDirection
+    // attributes of the nodes. The path is returned as a list of Moves.
     private LinkedList<Move> reconstructPath(Node current) {
         LinkedList<Move> totalPath = new LinkedList<Move>();
         do {
@@ -121,24 +127,30 @@ public class StatefulDrone extends Drone {
             Node.allNodes.clear();
         }
 
+        // Returns the Node object with the given position pos. Note that for there is at most one Node associated with
+        // each position
         public static Node getNodeWithPosition(Position pos) {
             Node newNode = new Node(pos);
+            // If a node with the given position already exists in allNodes return that node.
             for (Node n : allNodes)
                 if (n.equals(newNode))
                     return n;
+            // If a node with the given position does not exist in allNodes, return the newNode and add it to allNodes
             allNodes.add(newNode);
             return newNode;
         }
 
         public int compareTo(Node otherNode) {
-            return Double.compare(this.f, otherNode.f); // Nodes with lower f score are ranked higher
+            return Double.compare(this.f, otherNode.f); // Nodes with higher f score are ranked higher
         }
 
+        // Calculates the h-score (euclidean distance to position of target) and the f-score (f = g+h)
         public void calculateHandF(Station targetStation) {
             this.h = targetStation.distanceFromPosition(this.position);
             this.f = this.g + this.h;
         }
 
+        // Returns the adjacent nodes to this node in a map with keys the move directions to reach each adjacent node
         public Map<Direction, Node> expandNode() {
             Map<Direction, Node> adjacentNodes = new HashMap<Direction, Node>();
             for (Direction d : Direction.values()) {

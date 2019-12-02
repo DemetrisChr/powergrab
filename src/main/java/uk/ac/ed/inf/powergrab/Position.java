@@ -12,12 +12,14 @@ public class Position {
         this.longitude = longitude;
     }
 
+    // Finds the position after a move from this position to the given direction
     public Position nextPosition(Direction direction) {
         double newLatitude = this.latitude + GameRules.TRAVEL_DISTANCE * direction.cosine;
         double newLongitude = this.longitude + GameRules.TRAVEL_DISTANCE * direction.sine;
         return new Position(newLatitude, newLongitude);
     }
 
+    // Returns whether this position is within the play area boundaries
     public boolean inPlayArea() {
         return (longitude < GameRules.RIGHT)
                 && (longitude > GameRules.LEFT)
@@ -25,6 +27,7 @@ public class Position {
                 && (latitude < GameRules.TOP);
     }
 
+    // Returns the euclidean distance between this position and the given position pos
     public double distance(Position pos) {
         return Math.sqrt(Math.pow(this.latitude - pos.latitude, 2) + Math.pow(this.longitude - pos.longitude, 2));
     }

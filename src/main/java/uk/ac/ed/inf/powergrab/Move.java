@@ -13,15 +13,17 @@ public class Move {
         this.droneToMove = droneToMove;
     }
 
+    // Executes the move by calling the drone's move() method. Stores in the fields of this Move object the position
+    // of the drone before/after and its coins & power after the move.
     public void executeMove() {
         this.positionBefore = droneToMove.getPosition();
-        this.positionAfter = positionBefore.nextPosition(moveDirection);
         this.droneToMove.move(moveDirection);
         this.positionAfter = droneToMove.getPosition();
         this.powerAfter = droneToMove.getPower();
         this.coinsAfter = droneToMove.getCoins();
     }
 
+    // Returns a String representation of the attributes of the Move separated by commas
     @Override
     public String toString() {
         return this.positionBefore.latitude + "," +

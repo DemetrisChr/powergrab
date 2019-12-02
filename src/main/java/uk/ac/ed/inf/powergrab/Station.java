@@ -11,20 +11,20 @@ public class Station {
         this.power = power;
     }
 
+    // Returns the euclidean distance from the given position to the position of this station
     public double distanceFromPosition(Position pos) {
-        // Calculates the euclidean distance from the given position to the position of this station
         return this.position.distance(pos);
     }
 
+    // Checks whether the given position is within the range (connect distance) of this station
     public boolean positionInRange(Position pos) {
-        // Checks whether the given position is within the range (connect distance) of this station
         return this.distanceFromPosition(pos) < GameRules.CONNECT_DISTANCE;
     }
 
+    // Connects the given drone to this station. i.e. Coins & Power are given to or taken away from the drone
+    // If the station is negative and the drone has less coins/power than the absolute value of the coins/power
+    // of the station then the drone loses as many coins/power as possible, i.e. all of its coins/power
     public void connect(Drone drone) {
-        // Connects the given drone to this station. i.e. Coins & Power are given to or taken away from the drone
-        // If the station is negative and the drone has less coins/power than the absolute value of the coins/power
-        // of the station then the drone loses as many coins/power as possible, i.e. all of its coins/power
         this.power = drone.addOrSubtrPower(this.power);
         this.coins = drone.addOrSubtrCoins(this.coins);
     }

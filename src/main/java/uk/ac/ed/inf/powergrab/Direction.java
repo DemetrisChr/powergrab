@@ -31,6 +31,7 @@ public enum Direction {
         this.cosine = Math.cos(this.angle);
     }
 
+    // Returns the opposite to this direction.
     public Direction getOppositeDirection() {
         switch (this) {
             case N:   return S;

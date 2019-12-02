@@ -12,7 +12,7 @@ import java.util.Set;
 public class GameMap {
     private GeoJSON geoJsonDocument;
     private Set<Station> stations;
-    private double perfectScore = 0;
+    private double perfectScore = 0; // The perfect score is the sum of the coins of all positive stations
 
     public GameMap(String year, String month, String day) throws IOException {
         this.geoJsonDocument = new GeoJSON(year, month, day);
@@ -21,22 +21,23 @@ public class GameMap {
             this.perfectScore += Math.max(0, s.getCoins());
     }
 
-    public Station getConnectedStation(Position pos) {
-        // Find station within range of the given position. If no such station exists, null is returned.
-        Station connectedStation = Collections.min(this.stations, Comparator.comparing(s -> s.distanceFromPosition(pos)));
-        if (connectedStation.positionInRange(pos))
-            return connectedStation;
+    // Finds the station the given position pos is within range of (i.e. The station a drone at pos can connect to)
+    public Station getStationToConnect(Position pos) {
+        Station closestStation = Collections.min(this.stations, Comparator.comparing(s -> s.distanceFromPosition(pos)));
+        if (closestStation.positionInRange(pos))
+            // If pos is within range of the closest station, then that station is the station to connect
+            return closestStation;
         else
+            // pos is not within the range of any stations
             return null;
     }
 
+    // Finds the nearest positive station to given position pos, excluding the excludedStations
+    // If there are no positive stations found, null is returned
     public Station getNearestPositiveStation(Position pos, Set<Station> excludedStations) {
-        // Finds the nearest positive station to given position, excluding a set of stations
-        // If there are no positive stations found, null is returned
-        // If there is a station within range of the given position it is ignored
         Set<Station> stationsToCheck = new HashSet<Station>(this.stations);
-        stationsToCheck.removeAll(excludedStations);
-        stationsToCheck.remove(this.getConnectedStation(pos));
+        stationsToCheck.removeAll(excludedStations); // Ignore the excluded stations
+        stationsToCheck.remove(this.getStationToConnect(pos)); // Ignore the station pos is within range of
 
         double minDistance = Double.POSITIVE_INFINITY;
         Station nearestPositiveStation = null;
@@ -50,12 +51,14 @@ public class GameMap {
         return nearestPositiveStation;
     }
 
+    // Saves the Geo-JSON document to a file
     public void outputMapToFile(String fileName) throws FileNotFoundException {
         PrintWriter outputGeoJson = new PrintWriter(fileName+".geojson");
         outputGeoJson.println(geoJsonDocument);
         outputGeoJson.close();
     }
 
+    // Plots the drone's path to the Geo-JSON document
     public void addDronePathToMap(Drone drone) { this.geoJsonDocument.addPathToGeoJSON(drone.getPath()); }
 
     public double getPerfectScore() { return perfectScore; }

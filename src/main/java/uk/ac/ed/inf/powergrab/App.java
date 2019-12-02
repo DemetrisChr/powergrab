@@ -32,7 +32,7 @@ public class App {
                 ? new StatefulDrone(new Position(latitude, longitude), gameMap, randomSeed)
                 : new StatelessDrone(new Position(latitude, longitude), gameMap, randomSeed);
 
-        drone.planPath(); // Plan the path of the drone in the map
+        drone.findPath(); // Plan the path of the drone in the map
         gameMap.addDronePathToMap(drone); // Add the drone's path to the Geo-JSON document
 
         // Output the Geo-JSON document (with the added drone path) and the drone's move history to files
