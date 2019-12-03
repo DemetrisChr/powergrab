@@ -20,9 +20,9 @@ import java.util.HashSet;
 public class GeoJSON {
     private final FeatureCollection fc;
 
-    // The constructor connects to the server, retrieves and parses the Geo-JSON document for the given date
-    // Throws IOException if unable to connect to server or if the URL is malformed
-    public GeoJSON(String year, String month, String day) throws IOException {
+    // Returns the GeoJSON object for the specified date. Connects to the server, retrieves and parses the Geo-JSON
+    // document for the given date. Throws IOException if unable to connect to server or if the URL is malformed
+    public static GeoJSON retrieveDocumentForDate(String year, String month, String day) throws IOException {
         // Connect to the server
         String mapString = String.format("http://homepages.inf.ed.ac.uk/stg/powergrab/%s/%s/%s/powergrabmap.geojson", year, month, day);
         URL url = new URL(mapString);
@@ -40,7 +40,12 @@ public class GeoJSON {
         JsonParser parser = new JsonParser();
         JsonElement root = parser.parse(isReader);
         String mapSource = root.toString();
-        this.fc = FeatureCollection.fromJson(mapSource);
+        FeatureCollection featureCollection = FeatureCollection.fromJson(mapSource);
+        return new GeoJSON(featureCollection);
+    }
+
+    private GeoJSON(FeatureCollection featureCollection) {
+        this.fc = featureCollection;
     }
 
     // Returns a Set of the stations within the Geo-JSON document

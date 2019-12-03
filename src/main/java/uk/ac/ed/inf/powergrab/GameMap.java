@@ -15,7 +15,7 @@ public class GameMap {
     private double perfectScore = 0; // The perfect score is the sum of the coins of all positive stations
 
     public GameMap(String year, String month, String day) throws IOException {
-        this.geoJsonDocument = new GeoJSON(year, month, day);
+        this.geoJsonDocument = GeoJSON.retrieveDocumentForDate(year, month, day);
         this.stations = this.geoJsonDocument.getStationsFromMap();
         // Calculate the perfect score
         for (Station s : stations)
