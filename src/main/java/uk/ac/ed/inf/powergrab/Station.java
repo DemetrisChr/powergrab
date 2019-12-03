@@ -30,11 +30,11 @@ public class Station {
     }
 
     public boolean isPositive() {
-        return this.coins > 0;
+        return this.coins > 0 || this.power > 0;
     }
 
     public boolean isNegative() {
-        return this.coins < 0;
+        return this.coins < 0 || this.power < 0;
     }
 
     public double getCoins() { return coins; }
