@@ -28,7 +28,7 @@ public class StatelessDrone extends Drone {
             Station s = this.gameMap.getStationToConnect(p);
             if (p.inPlayArea()) {
                 double coins = (s == null) ? 0 : s.getCoins();
-                if (Math.abs(coins - maxCoins) < 1.0E-8)
+                if (Math.abs(coins - maxCoins) < 1.0E-7)
                     // This move direction leads to a connection with a station which gives maximum coins
                     bestDirections.add(d);
                 else if (coins > maxCoins) {
