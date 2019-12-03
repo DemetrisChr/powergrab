@@ -85,7 +85,7 @@ public class StatefulDrone extends Drone {
 
     // Calculates the penalty associated with this Node. The penalty is non-zero only for nodes with position within the
     // range of a negative station.
-    public double calculatePenalty(Node node) {
+    private double calculatePenalty(Node node) {
         double penalty = 0;
         Station stationToConnect = gameMap.getStationToConnect(node.position);
         if (stationToConnect != null && stationToConnect.isNegative())
