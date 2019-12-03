@@ -17,6 +17,7 @@ public class GameMap {
     public GameMap(String year, String month, String day) throws IOException {
         this.geoJsonDocument = new GeoJSON(year, month, day);
         this.stations = this.geoJsonDocument.getStationsFromMap();
+        // Calculate the perfect score
         for (Station s : stations)
             this.perfectScore += Math.max(0, s.getCoins());
     }
@@ -41,6 +42,7 @@ public class GameMap {
 
         double minDistance = Double.POSITIVE_INFINITY;
         Station nearestPositiveStation = null;
+        // Find the nearest positive station (Euclidean distance used)
         for (Station s : stationsToCheck) {
             double dist = s.distanceFromPosition(pos);
             if (s.isPositive() && (dist < minDistance)) {
