@@ -1,7 +1,5 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class Position {
     public final double latitude;

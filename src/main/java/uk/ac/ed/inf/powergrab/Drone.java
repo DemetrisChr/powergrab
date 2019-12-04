@@ -1,6 +1,5 @@
 package uk.ac.ed.inf.powergrab;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -46,7 +45,7 @@ public abstract class Drone {
         }
     }
 
-    // Adds or sunbtracts deltaCoins from the drone's coins (depending on the sign of deltaCoins)
+    // Adds or subtracts deltaCoins from the drone's coins (depending on the sign of deltaCoins)
     public double addOrSubtrCoins(double deltaCoins) {
         if ((deltaCoins < 0) && (this.coins < -deltaCoins)) {
             // The drone has less coins than the amount to be subtracted
