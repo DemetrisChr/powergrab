@@ -214,7 +214,7 @@ public class AppTest extends TestCase {
         assertTrue(approxEq(p5, stop));
     }
 
-    public void testConnectDroneToStationNotEnoughCoins() {
+    public void testConnectDroneNotEnoughCoins() {
         Drone dr;
         try {
             dr = new StatelessDrone(p0, new GameMap("2019", "10", "10"), 100);
@@ -293,5 +293,4 @@ public class AppTest extends TestCase {
         assertTrue(approxEq(200, dr.getCoins()));
         assertTrue(approxEq(0, s.getCoins()));
     }
-
 }
