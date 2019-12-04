@@ -11,14 +11,14 @@ public abstract class Drone {
     protected Position position;
     protected double power = GameRules.INITIAL_POWER;
     protected double coins = 0;
-    protected Random rnd = new Random();
-    protected List<Move> moveHistory = new ArrayList<Move>();
-    protected GameMap gameMap = null;
+    protected final Random rnd;
+    protected final List<Move> moveHistory = new ArrayList<Move>();
+    protected final GameMap gameMap;
 
     public Drone(Position position, GameMap gameMap, long randomSeed) {
         this.position = position;
         this.gameMap = gameMap;
-        this.rnd.setSeed(randomSeed);
+        this.rnd = new Random(randomSeed);
     }
 
     public abstract void findPath();

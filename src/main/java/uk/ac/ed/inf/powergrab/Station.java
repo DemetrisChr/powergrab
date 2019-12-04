@@ -1,7 +1,7 @@
 package uk.ac.ed.inf.powergrab;
 
 public class Station {
-    private Position position;
+    private final Position position;
     private double coins;
     private double power;
 

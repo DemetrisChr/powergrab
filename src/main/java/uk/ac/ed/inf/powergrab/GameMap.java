@@ -10,16 +10,18 @@ import java.util.List;
 import java.util.Set;
 
 public class GameMap {
-    private GeoJSON geoJsonDocument;
-    private Set<Station> stations;
-    private double perfectScore = 0; // The perfect score is the sum of the coins of all positive stations
+    private final GeoJSON geoJsonDocument;
+    private final Set<Station> stations;
+    private final double perfectScore; // Sum of coins of all positive stations
 
     public GameMap(String year, String month, String day) throws IOException {
         this.geoJsonDocument = GeoJSON.retrieveDocumentForDate(year, month, day);
         this.stations = this.geoJsonDocument.getStationsFromMap();
         // Calculate the perfect score
+        double ps = 0;
         for (Station s : stations)
-            this.perfectScore += Math.max(0, s.getCoins());
+            ps += Math.max(0, s.getCoins());
+        this.perfectScore =  ps;
     }
 
     // Finds the station the given position pos is within range of (i.e. The station a drone at pos can connect to)

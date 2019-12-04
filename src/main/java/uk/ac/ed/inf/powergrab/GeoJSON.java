@@ -18,7 +18,7 @@ import java.util.HashSet;
 
 
 public class GeoJSON {
-    private final FeatureCollection fc;
+    private final FeatureCollection featureCollection;
 
     // Returns the GeoJSON object for the specified date. Connects to the server, retrieves and parses the Geo-JSON
     // document for the given date. Throws IOException if unable to connect to server or if the URL is malformed
@@ -45,13 +45,13 @@ public class GeoJSON {
     }
 
     private GeoJSON(FeatureCollection featureCollection) {
-        this.fc = featureCollection;
+        this.featureCollection = featureCollection;
     }
 
     // Returns a Set of the stations within the Geo-JSON document
     public Set<Station> getStationsFromMap(){
         Set<Station> stations = new HashSet<Station>();
-        for (Feature f : fc.features()) {
+        for (Feature f : featureCollection.features()) {
             // For each station read its coins, power & coordinates and construct a Station object with these attributes
             double coins = f.getProperty("coins").getAsDouble();
             double power = f.getProperty("power").getAsDouble();
@@ -72,11 +72,11 @@ public class GeoJSON {
             pointsList.add(Point.fromLngLat(pos.longitude, pos.latitude));
         LineString flightPath = LineString.fromLngLats(pointsList);
         Feature f = Feature.fromGeometry(flightPath);
-        fc.features().add(f);
+        featureCollection.features().add(f);
     }
 
     @Override
     public String toString() {
-        return this.fc.toJson();
+        return this.featureCollection.toJson();
     }
 }

@@ -5,7 +5,9 @@ import java.util.Collections;
 
 public class StatelessDrone extends Drone {
 
-    public StatelessDrone(Position position, GameMap gameMap, long randomSeed) { super(position, gameMap, randomSeed); }
+    public StatelessDrone(Position position, GameMap gameMap, long randomSeed) {
+        super(position, gameMap, randomSeed);
+    }
 
     public void findPath() {
         int numMoves = 0;

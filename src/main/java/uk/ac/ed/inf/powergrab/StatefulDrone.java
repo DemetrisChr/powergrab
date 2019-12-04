@@ -6,7 +6,9 @@ public class StatefulDrone extends Drone {
 
     private Station targetStation = null;
 
-    public StatefulDrone(Position position, GameMap gameMap, long randomSeed) { super(position, gameMap, randomSeed); }
+    public StatefulDrone(Position position, GameMap gameMap, long randomSeed) {
+        super(position, gameMap, randomSeed);
+    }
 
     public void findPath() {
         int numMoves = 0;
@@ -112,7 +114,7 @@ public class StatefulDrone extends Drone {
     private static class Node implements Comparable<Node> {
         private static Set<Node> allNodes = new HashSet<Node>();
 
-        public Position position;
+        public final Position position;
         public double g = Double.POSITIVE_INFINITY; // Distance travelled on shortest path to reach node
         public double h = Double.POSITIVE_INFINITY; // Estimated distance to target
         public double f = Double.POSITIVE_INFINITY; // f = g + h
@@ -132,9 +134,9 @@ public class StatefulDrone extends Drone {
         public static Node getNodeWithPosition(Position pos) {
             Node newNode = new Node(pos);
             // If a node with the given position already exists in allNodes return that node.
-            for (Node n : allNodes)
-                if (n.equals(newNode))
-                    return n;
+            for (Node node : allNodes)
+                if (node.equals(newNode))
+                    return node;
             // If a node with the given position does not exist in allNodes, return the newNode and add it to allNodes
             allNodes.add(newNode);
             return newNode;

@@ -1,12 +1,12 @@
 package uk.ac.ed.inf.powergrab;
 
 public class Move {
-    private Position positionBefore = null;
-    private Direction moveDirection;
-    private Position positionAfter = null;
-    private Double coinsAfter = null;
-    private Double powerAfter = null;
-    private Drone droneToMove;
+    private Position positionBefore;
+    private final Direction moveDirection;
+    private Position positionAfter;
+    private double coinsAfter;
+    private double powerAfter;
+    private final Drone droneToMove;
 
     public Move(Drone droneToMove, Direction moveDirection) {
         this.moveDirection = moveDirection;
