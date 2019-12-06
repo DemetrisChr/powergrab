@@ -1,6 +1,5 @@
 package uk.ac.ed.inf.powergrab;
 
-
 public class Position {
     public final double latitude;
     public final double longitude;
