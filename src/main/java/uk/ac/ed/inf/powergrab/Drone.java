@@ -66,11 +66,19 @@ public abstract class Drone {
         return path;
     }
 
-    // Saves the drone's move history to a text file with the given fileName
+    // Outputs the drone's move history to a text file with the given fileName
+    // The
     public void outputMoveHistoryToFile(String fileName) throws FileNotFoundException {
         PrintWriter outputMoveHistory = new PrintWriter(fileName+".txt");
-        for (Move move : this.moveHistory)
-            outputMoveHistory.println(move);
+        boolean firstMove = true;
+        for (Move move : this.moveHistory) {
+            // Go to the next line if the move is not the first one (avoids empty new line at the start)
+            if (firstMove)
+                firstMove = false;
+            else
+                outputMoveHistory.println();
+            outputMoveHistory.print(move);
+        }
         outputMoveHistory.close();
     }
 

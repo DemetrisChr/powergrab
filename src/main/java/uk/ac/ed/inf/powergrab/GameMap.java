@@ -57,12 +57,14 @@ public class GameMap {
     // Saves the Geo-JSON document to a file
     public void outputMapToFile(String fileName) throws FileNotFoundException {
         PrintWriter outputGeoJson = new PrintWriter(fileName+".geojson");
-        outputGeoJson.println(geoJsonDocument);
+        outputGeoJson.print(geoJsonDocument);
         outputGeoJson.close();
     }
 
     // Plots the drone's path to the Geo-JSON document
-    public void addDronePathToMap(Drone drone) { this.geoJsonDocument.addPathToGeoJSON(drone.getPath()); }
+    public void addDronePathToMap(Drone drone) {
+        this.geoJsonDocument.addPathToGeoJSON(drone.getPath());
+    }
 
     public double getPerfectScore() { return perfectScore; }
 }
